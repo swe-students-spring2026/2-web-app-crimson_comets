@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="shell">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="app-title">Movie App</div>
+
+      <div class="topbar-right">
+        <span class="pill">{{ user.role|upper }}</span>
+        <a class="link" href="{{ url_for('logout') }}">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="main">
+
+    {% if user.role == "filmmaker" %}
+    <section class="card profile-card">
+        <div class="avatar">{{ profile.display_name[:1]|upper }}</div>
+
+        <h1 class="username">{{ profile.display_name }}</h1>
+        <p class="bio">{{ profile.bio }}</p>
+
+        <div class="stats">
+        <div class="stat">
+            <div class="stat-num">{{ profile.stats.movies_posted }}</div>
+            <div class="stat-label">Movies Posted</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">{{ profile.stats.total_views }}</div>
+            <div class="stat-label">Total Views</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">{{ profile.stats.total_comments }}</div>
+            <div class="stat-label">Comments</div>
+        </div>
+        </div>
+
+        <div class="actions">
+        <!-- filmmaker extra actions -->
+        <button class="btn primary" type="button"> + Post Movie</button>
+        <button class="btn" type="button">Browse My Movies</button>
+
+        <!-- shared/basic actions -->
+        <button class="btn" type="button">Movie Search</button>
+        <button class="btn" type="button">Manage Folders</button>
+        </div>
+    </section>
+
+    <!-- My Movies -->
+    <section class="section">
+        <div class="section-head">
+        <h2 class="section-title">My Movies</h2>
+        </div>
+
+        <div class="folder-grid">
+        {% for m in profile.my_movies %}
+            <div class="folder-card">
+            <div class="folder-top">
+                <div class="folder-name">{{ m.title }}</div>
+                <span class="chip">{{ m.status }}</span>
+            </div>
+            <div class="muted small">Views: {{ m.views }} · Comments: {{ m.comments }}</div>
+            <button class="btn tiny" type="button">Open</button>
+            </div>
+        {% endfor %}
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-head">
+        <h2 class="section-title">Your Folders</h2>
+        </div>
+
+        <div class="folder-grid">
+        {% for f in profile.folders %}
+            <div class="folder-card">
+            <div class="folder-top">
+                <div class="folder-name">{{ f.name }}</div>
+                <span class="chip">{{ f.count }} movies</span>
+            </div>
+            <div class="muted small">A quick collection for {{ f.name|lower }}.</div>
+            <button class="btn tiny" type="button">Open</button>
+            </div>
+        {% endfor %}
+        </div>
+    </section>
+
+    {% else %}
+
+      <!-- Profile card -->
+      <section class="card profile-card">
+        <div class="avatar">{{ profile.display_name[:1]|upper }}</div>
+
+        <h1 class="username">{{ profile.display_name }}</h1>
+        <p class="bio">{{ profile.bio }}</p>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-num">{{ profile.stats.folders }}</div>
+            <div class="stat-label">Folders</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">{{ profile.stats.saved_movies }}</div>
+            <div class="stat-label">Saved Movies</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">{{ profile.stats.reviews_written }}</div>
+            <div class="stat-label">Reviews</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" type="button"> Movie Search</button>
+          <button class="btn" type="button"> Manage Folders</button>
+        </div>
+      </section>
+
+      <!-- Folder section -->
+      <section class="section">
+        <div class="section-head">
+          <h2 class="section-title">Your Folders</h2>
+        </div>
+
+        <div class="folder-grid">
+          {% for f in profile.folders %}
+            <div class="folder-card">
+              <div class="folder-top">
+                <div class="folder-name">{{ f.name }}</div>
+                <span class="chip">{{ f.count }} movies</span>
+              </div>
+              <div class="folder-desc muted small">
+                A quick collection for {{ f.name|lower }}.
+              </div>
+              <button class="btn tiny" type="button">Open</button>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+
+    {% endif %}
+
+  </main>
+</div>
+{% endblock %}

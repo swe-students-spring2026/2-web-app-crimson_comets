@@ -1,0 +1,102 @@
+import os
+from dataclasses import dataclass
+from dotenv import load_dotenv
+
+from flask import Flask, render_template, redirect, url_for, request
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+
+load_dotenv()
+
+app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev_fallback_secret")
+
+login_manager = LoginManager()
+login_manager.login_view = "login"
+login_manager.init_app(app)
+
+@dataclass
+class DummyUser(UserMixin):
+    id: str
+    username: str
+    role: str
+
+DUMMY_USERS = {
+    "u1": DummyUser(id="u1", username="roger_user", role="user"),
+    "f1": DummyUser(id="f1", username="roger_filmmaker", role="filmmaker"),
+}
+
+@login_manager.user_loader
+def load_user(user_id: str):
+    return DUMMY_USERS.get(user_id)
+
+@app.get("/")
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
+    return redirect(url_for("login"))
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        role = request.form.get("role", "user")
+        username = (request.form.get("username") or "").strip() or ("roger_user" if role == "user" else "roger_filmmaker")
+
+        user_obj = DUMMY_USERS["u1"] if role == "user" else DUMMY_USERS["f1"]
+        user_obj.username = username
+        login_user(user_obj)
+        return redirect(url_for("home"))
+
+    return render_template("login.html")
+
+@app.get("/home")
+@login_required
+def home():
+    if getattr(current_user, "role", "user") == "filmmaker":
+        profile_data = {
+            "display_name": current_user.username,
+            "bio": "Filmmaker profile (dummy). Post movies and track audience engagement.",
+            "stats": {
+                "movies_posted": 6,
+                "total_views": 12840,
+                "total_comments": 912,
+                "avg_rating": 4.6,
+            },
+            "folders": [
+                {"name": "My Inspirations", "count": 9},
+                {"name": "My Favorites", "count": 14},
+                {"name": "Cool stuff", "count": 6},
+            ],
+            "my_movies": [
+                {"title": "My Short Film A", "status": "Published", "views": 3200, "comments": 210},
+            ],
+        }
+    else:
+        profile_data = {
+            "display_name": current_user.username,
+            "bio": "Movie lover profile (dummy). Save films, organize folders, and write reviews.",
+            "folders": [
+                {"name": "Watch Later", "count": 12},
+                {"name": "Top Rated", "count": 8},
+                {"name": "Comedy Nights", "count": 5},
+            ],
+            "stats": {
+                "folders": 3,
+                "saved_movies": 25,
+                "reviews_written": 4,
+            },
+        }
+
+    return render_template(
+        "home.html",
+        user=current_user,
+        profile=profile_data,
+    )
+
+@app.get("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+if __name__ == "__main__":
+    app.run(debug=True)
