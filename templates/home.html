@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="card">
+  <h2>Search Movies</h2>
+
+  <form action="/search" method="GET" class="search-form">
+    <input
+      type="text"
+      name="q"
+      placeholder="Search by title, director, or actor"
+      class="search-input"
+    >
+    <button type="submit" class="btn primary">Search</button>
+  </form>
+
+  <p class="muted small" style="margin-top:10px;">
+    Can’t find a movie? Search first — if there’s no match, you’ll see an option to add it.
+  </p>
+</section>
+
+<section class="card">
+  <h3>Hot Movies</h3>
+
+  <!-- HOT MOVIE 1 -->
+  <a class="poster-row" href="/movie/1">
+    <img class="poster" src="https://via.placeholder.com/80x120?text=Poster" alt="Dune poster">
+    <div class="poster-info">
+      <div class="poster-title">Dune <span class="muted">(2021)</span></div>
+      <div class="muted small">Director: Denis Villeneuve</div>
+      <div class="muted small">⭐ 4.4</div>
+    </div>
+  </a>
+
+  <!-- HOT MOVIE 2 -->
+  <a class="poster-row" href="/movie/2">
+    <img class="poster" src="https://via.placeholder.com/80x120?text=Poster" alt="Barbie poster">
+    <div class="poster-info">
+      <div class="poster-title">Barbie <span class="muted">(2023)</span></div>
+      <div class="muted small">Director: Greta Gerwig</div>
+      <div class="muted small">⭐ 4.1</div>
+    </div>
+  </a>
+
+</section>
+
+{% endblock %}
