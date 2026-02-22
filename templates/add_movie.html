@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="card">
+  <h2>Add a Movie</h2>
+  <p class="muted">
+    If the movie isn’t in our database, you can submit it here. Submissions may require review.
+  </p>
+</section>
+
+<section class="card">
+  <form method="POST" action="/movies/new">
+
+    <label class="label" for="title">Movie Title *</label>
+    <input class="input" id="title" name="title" type="text" placeholder="e.g., Dune" required>
+
+    <label class="label" for="year">Year</label>
+    <input class="input" id="year" name="year" type="number" placeholder="e.g., 2021" min="1888" max="2100">
+
+    <label class="label" for="genre">Genre</label>
+    <input class="input" id="genre" name="genre" type="text" placeholder="e.g., Sci-Fi, Drama">
+
+    <label class="label" for="director">Director *</label>
+    <input class="input" id="director" name="director" type="text" placeholder="e.g., Denis Villeneuve" required>
+
+    <label class="label" for="cast">Cast (comma-separated)</label>
+    <input class="input" id="cast" name="cast" type="text" placeholder="e.g., Timothée Chalamet, Zendaya">
+
+    <label class="label" for="crew">Crew (comma-separated)</label>
+    <input class="input" id="crew" name="crew" type="text" placeholder="e.g., Cinematographer: Greig Fraser">
+
+    <label class="label" for="synopsis">Synopsis / Description</label>
+    <textarea class="input" id="synopsis" name="synopsis" rows="4" placeholder="Short description of the movie..."></textarea>
+
+    <label class="label" for="reason">Why do you recommend it?</label>
+    <textarea class="input" id="reason" name="reason" rows="3" placeholder="Your recommendation / notes..."></textarea>
+
+    <label class="label" for="bts">Behind-the-scenes / Production Notes (optional)</label>
+    <textarea class="input" id="bts" name="bts" rows="4" placeholder="Share production details, fun facts, etc."></textarea>
+
+    <button class="btn primary" type="submit">Submit Movie</button>
+    <a class="btn secondary" href="/">Cancel</a>
+
+    <p class="muted small" style="margin-top:12px;">
+      * Required fields. Submissions may be reviewed before appearing publicly.
+    </p>
+
+  </form>
+</section>
+
+{% endblock %}
