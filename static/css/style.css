@@ -1,0 +1,241 @@
+:root{
+  --bg: #fdfdff;
+  --card: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #d8dce6;         /* 边框更清晰一点 */
+  --radius: 10px;            /* 圆角更小 */
+  --radius-sm: 8px;
+}
+
+*{ box-sizing: border-box; }
+
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.shell{ min-height: 100vh; }
+
+/* top bar */
+.topbar{
+  position: sticky;
+  top: 0;
+  background: #fdfdff;              /* 去掉玻璃质感 */
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+.topbar-inner{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center; /* title居中 */
+  position: relative;
+}
+.app-title{
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  font-size: 20px;
+}
+.topbar-right{
+  position: absolute;
+  right: 20px;
+  display:flex;
+  align-items:center;
+  gap: 12px;
+}
+
+.link{
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 700;
+}
+.link:hover{ text-decoration: underline; }
+
+.pill{
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: #374151;
+}
+
+/* main layout */
+.main{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 50px;
+  display: grid;
+  gap: 18px;
+}
+
+/* cards - 去阴影、圆角变小、边框更整齐 */
+.card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: none;                 /* ✅ 去阴影 */
+}
+
+/* profile card */
+.profile-card{
+  padding: 24px 22px;
+  text-align: center;
+}
+
+.avatar{
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 12px;
+  border-radius: var(--radius-sm);  /* ✅ 小圆角 */
+  border: 1px solid var(--border);
+  display:grid;
+  place-items:center;
+  font-weight: 900;
+  background: #f3f4f6;
+}
+
+.username{
+  margin: 0;
+  font-size: 28px;
+  font-weight: 900;
+}
+.bio{
+  margin: 10px auto 18px;
+  max-width: 620px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* stats */
+.stats{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 auto 16px;
+  max-width: 720px;
+}
+
+.stat{
+  border: 1px solid var(--border);
+  border-radius: var(--radius);     /* ✅ 小圆角一致 */
+  padding: 14px 12px;
+  background: #ffffff;              /* 更平面 */
+}
+
+.stat-num{
+  font-size: 20px;
+  font-weight: 900;
+}
+.stat-label{
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* actions */
+.actions{
+  display:flex;
+  justify-content:center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* buttons */
+.btn{
+  border: 1px solid var(--border);
+  background: #ffffff;
+  padding: 10px 14px;
+  border-radius: 10px;              /* ✅ 更不圆 */
+  cursor: pointer;
+  font-weight: 800;
+  color: #111827;
+}
+.btn:hover{ background: #f3f4f6; }
+
+.btn.primary{
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+.btn.primary:hover{ background: #1d4ed8; }
+
+.btn.tiny{
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  width: 100%;                      /* ✅ folder里的Open按钮整齐铺满 */
+}
+
+/* section header */
+.section-head{
+  display:flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 2px 8px;
+}
+.section-title{
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+}
+.muted{ color: var(--muted); }
+.small{ font-size: 12px; }
+
+/* folder grid */
+.folder-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.folder-card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: none;                 /* ✅ 去阴影 */
+  padding: 16px;
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.folder-top{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.folder-name{
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.chip{
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  border: 1px solid var(--border);
+  color: #374151;
+}
+
+/* responsive */
+@media (max-width: 900px){
+  .folder-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px){
+  .stats{ grid-template-columns: 1fr; }
+  .folder-grid{ grid-template-columns: 1fr; }
+  .topbar-right{ right: 12px; }
+  .topbar-inner{ padding: 14px 12px; }
+}
