@@ -3,7 +3,14 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 
 from flask import Flask, render_template, redirect, url_for, request
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    login_required,
+    logout_user,
+    current_user,
+)
 
 load_dotenv()
 
@@ -14,32 +21,40 @@ login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.init_app(app)
 
+
 @dataclass
 class DummyUser(UserMixin):
     id: str
     username: str
     role: str
 
+
 DUMMY_USERS = {
     "u1": DummyUser(id="u1", username="roger_user", role="user"),
     "f1": DummyUser(id="f1", username="roger_filmmaker", role="filmmaker"),
 }
 
+
 @login_manager.user_loader
 def load_user(user_id: str):
     return DUMMY_USERS.get(user_id)
 
+
+# ---------- Auth / entry ----------
 @app.get("/")
 def index():
     if current_user.is_authenticated:
         return redirect(url_for("home"))
     return redirect(url_for("login"))
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         role = request.form.get("role", "user")
-        username = (request.form.get("username") or "").strip() or ("roger_user" if role == "user" else "roger_filmmaker")
+        username = (request.form.get("username") or "").strip() or (
+            "roger_user" if role == "user" else "roger_filmmaker"
+        )
 
         user_obj = DUMMY_USERS["u1"] if role == "user" else DUMMY_USERS["f1"]
         user_obj.username = username
@@ -48,6 +63,15 @@ def login():
 
     return render_template("login.html")
 
+
+@app.get("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+
+# ---------- Home ----------
 @app.get("/home")
 @login_required
 def home():
@@ -86,17 +110,33 @@ def home():
             },
         }
 
-    return render_template(
-        "home.html",
-        user=current_user,
-        profile=profile_data,
-    )
+    return render_template("home.html", user=current_user, profile=profile_data)
 
-@app.get("/logout")
+
+# ---------- Search pages (Kara) ----------
+@app.get("/search")
 @login_required
-def logout():
-    logout_user()
-    return redirect(url_for("login"))
+def search():
+    query = request.args.get("q", "")
+    return render_template("results.html", query=query, user=current_user)
+
+
+@app.get("/movie/<movie_id>")
+@login_required
+def movie_detail(movie_id):
+    return render_template("movie_detail.html", movie_id=movie_id, user=current_user)
+
+
+@app.route("/movies/new", methods=["GET", "POST"])
+@login_required
+def add_movie():
+    if request.method == "POST":
+        # dummy for now
+        print("Movie submitted (dummy).")
+        return redirect(url_for("home"))
+
+    return render_template("add_movie.html", user=current_user)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
