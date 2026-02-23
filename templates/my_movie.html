@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="margin-bottom:10px;">
+  <button onclick="history.back()" class="btn secondary">← Back</button>
+</div>
+
+<!-- TOP: poster + basic info -->
+<div class="detail-top card">
+  <img class="poster-lg"
+       src="{{ movie.Poster }}"
+       alt="Poster">
+
+  <div>
+    <h2 class="movie-title">{{ movie.title }} <span class="muted">({{ movie.year }})</span></h2>
+    <p class="muted">{{ movie.genre }} · {{ movie.runtime }}</p>
+
+    <div class="meta">
+      <div><span class="label">Director:</span> {{ movie.director }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Rating -->
+<section class="rating-summary card">
+  <div class="big-rating">
+    <div class="stars">⭐ {{ movie.avg_rating }} / 5</div>
+    <div class="muted">{{ movie.total_ratings }} ratings</div>
+  </div>
+</section>
+
+<!-- Cast & Crew -->
+<section class="card">
+  <h3>Cast</h3>
+  {% for cast in movie.cast %}
+  <div class="cast-row">
+    <div class="cast-name">{{ cast.name }}</div>
+    <div class="muted">{{ cast.role }}</div>
+  </div>
+  {% endfor %}
+
+  <hr style="border: none; border-top: 1px solid var(--border); margin: 12px 0;">
+
+  <h3>Crew</h3>
+  {% for crew in movie.crew %}
+  <div class="cast-row">
+    <div class="cast-name">{{ crew.name }}</div>
+    <div class="muted">{{ crew.role }}</div>
+  </div>
+  {% endfor %}
+</section>
+
+<!-- Comments -->
+<section class="card">
+  <h3>Top comments</h3>
+  {% for comment in comments %}
+  <div class="comment">
+    <div class="row space-between">
+      <div>
+        <div class="comment-author">{{ comment.author }}</div>
+        <div class="muted small">{{ comment.time }}</div>
+      </div>
+
+      <form method="POST" action="/movie/{{ movie.id }}/comments/{{ comment.id }}/like">
+        <button class="like-btn" type="submit">👍 {{ comment.likes }}</button>
+      </form>
+    </div>
+
+    <p class="comment-text">{{ comment.text }}</p>
+
+    <details class="reply-box">
+      <summary class="reply-btn">Reply</summary>
+      <textarea placeholder="Write a reply..."></textarea>
+      <button type="button">Post Reply</button>
+    </details>
+  </div>
+  {% endfor %}
+</section>
+
+{% endblock %}

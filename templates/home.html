@@ -129,7 +129,9 @@
                 <span class="chip">{{ m.status }}</span>
               </div>
               <div class="muted small">Views: {{ m.views }} · Comments: {{ m.comments }}</div>
-              <button class="btn tiny" type="button">Open</button>
+              <a href="{{ url_for('my_movie', movie_id='1') }}">
+                <button class="btn tiny" type="button">Open</button>
+              </a>
             </div>
           {% endfor %}
         </div>

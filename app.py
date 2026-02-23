@@ -140,7 +140,7 @@ def create_app():
         return render_template("add_movie.html", user=current_user)
 
 
-    # ---------- Post Film (Ginny) ----------
+    # ---------- POST Movie (Ginny) ----------
     @app.route("/post", methods=["GET", "POST"])
     @login_required
     def post_movie():
@@ -150,6 +150,49 @@ def create_app():
             return redirect(url_for("home"))
         
         return render_template("post_movie.html", user=current_user)
+
+
+    # ---------- My Movie (Ginny) ----------
+    @app.route("/my-movie/<movie_id>")
+    @login_required
+    def my_movie(movie_id):
+        movie = {
+            "_id": 1,
+            "title": "XXX",
+            "year": 2025,
+            "genre": "Comedy",
+            "runtime": "20 min",
+            "director": "Roger(you)",
+            "cast": [
+                {"name": "Timothée Chalamet", "role": "Lead Actor"}, 
+                {"name": "Zendaya", "role": "Supporting Actor"}, 
+            ],
+            "crew": [
+                {"name": "Roger Geakins", "role": "Cinematographer"},
+                {"name": "Michael P. Shawver", "role": "Editor"},
+            ],
+            "poster": "https://via.placeholder.com/120x180?text=Poster",
+            "avg_rating": 4.4,
+            "total_ratings": 123,
+        }
+
+        comments = [
+            {
+                "_id": "c1",
+                "author": "alice",
+                "time": "2 days ago",
+                "text": "Incredible cinematography and sound design. Slow pace but worth it.",
+                "likes": 38,
+            },
+            {
+                "_id": "c2",
+                "author": "ginny",
+                "time": "1 hour ago",
+                "text": "Outstanding in the Indie Film world",
+                "likes": 4,
+            },
+        ]
+        return render_template("my_movie.html", movie=movie, comments=comments, user=current_user)
 
     return app
 
