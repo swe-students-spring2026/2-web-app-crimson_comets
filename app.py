@@ -140,10 +140,11 @@ def create_app():
         return render_template("add_movie.html", user=current_user)
 
     DUMMY_MOVIE = {
-        "_id": 1,
+        "_id": 3,
         "title": "XXX",
         "year": 2025,
         "genre": "Comedy",
+        "logline": "A film about a student struggling in software engineering class",
         "runtime": "20 min",
         "director": "Roger(you)",
         "cast": [
@@ -155,6 +156,7 @@ def create_app():
             {"name": "Michael P. Shawver", "role": "Editor"},
         ],
         "poster": "https://via.placeholder.com/120x180?text=Poster",
+        "awards": "Oscar Best Cinematography",
         "avg_rating": 4.4,
         "total_ratings": 123,
     }
