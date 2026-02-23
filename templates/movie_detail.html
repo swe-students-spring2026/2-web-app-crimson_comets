@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="margin-bottom:10px;">
+  <button onclick="history.back()" class="btn secondary">← Back</button>
+</div>
+
+<!-- TOP: poster + basic info -->
+<div class="detail-top card">
+  <img class="poster-lg"
+       src="https://via.placeholder.com/120x180?text=Poster"
+       alt="Poster">
+
+  <div>
+    <h2 class="movie-title">Dune <span class="muted">(2021)</span></h2>
+    <p class="muted">Sci-Fi · 155 min</p>
+
+    <div class="meta">
+      <div><span class="label">Director:</span> Denis Villeneuve</div>
+      <div><span class="label">Cast:</span> Timothée Chalamet, Zendaya, Rebecca Ferguson</div>
+    </div>
+  </div>
+</div>
+
+<!-- Rating summary -->
+<section class="rating-summary card">
+  <div class="big-rating">
+    <div class="stars">⭐ 4.4 / 5</div>
+    <div class="muted">123 ratings</div>
+  </div>
+</section>
+
+<!-- YOUR RATING (dummy) -->
+<section class="card">
+  <h3>Your rating</h3>
+  <div class="row space-between">
+    <div><strong>5 / 5</strong></div>
+
+    <div class="row gap">
+      <a class="btn secondary" href="/movie/1/rating/edit">Edit</a>
+
+      <form method="POST" action="/movie/1/rating/delete">
+        <button class="btn danger" type="submit">Delete</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- RATE MOVIE (dummy) -->
+<section class="card">
+  <h3>Rate this movie</h3>
+
+  <form method="POST" action="/movie/1/rating">
+    <label class="label">Select rating</label>
+    <select name="rating" class="input">
+      <option value="">Choose...</option>
+      <option value="1">1 - Terrible</option>
+      <option value="2">2 - Bad</option>
+      <option value="3">3 - OK</option>
+      <option value="4">4 - Good</option>
+      <option value="5">5 - Excellent</option>
+    </select>
+
+    <button class="btn primary" type="submit">Submit rating</button>
+  </form>
+</section>
+
+<!-- Comments -->
+<section class="card">
+  <h3>Top comments</h3>
+
+  <div class="comment">
+    <div class="row space-between">
+      <div>
+        <div class="comment-author">alice</div>
+        <div class="muted small">2 days ago</div>
+      </div>
+
+      <form method="POST" action="/movie/1/comments/c1/like">
+        <button class="like-btn" type="submit">👍 38</button>
+      </form>
+    </div>
+
+    <p class="comment-text">
+      Incredible cinematography and sound design. Slow pace but worth it.
+    </p>
+  </div>
+
+  <div class="comment">
+    <div class="row space-between">
+      <div>
+        <div class="comment-author">kara (you)</div>
+        <div class="muted small">1 hour ago</div>
+      </div>
+
+      <form method="POST" action="/movie/1/comments/c2/like">
+        <button class="like-btn" type="submit">👍 4</button>
+      </form>
+    </div>
+
+    <p class="comment-text">
+      Loved the world-building. The visuals were stunning.
+    </p>
+
+    <div class="row gap">
+      <a class="btn secondary" href="/movie/1/comments/c2/edit">Edit</a>
+
+      <form method="POST" action="/movie/1/comments/c2/delete">
+        <button class="btn danger" type="submit">Delete</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Add comment -->
+<section class="card">
+  <h3>Add a comment</h3>
+
+  <form method="POST" action="/movie/1/comments/new">
+    <label class="label">Your comment</label>
+    <textarea name="content" rows="4" class="input" placeholder="Write your thoughts..."></textarea>
+
+    <button class="btn primary" type="submit">Post comment</button>
+  </form>
+</section>
+
+{% endblock %}

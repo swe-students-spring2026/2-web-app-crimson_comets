@@ -1,11 +1,18 @@
+/* =========================
+   DESIGN TOKENS
+   ========================= */
 :root{
   --bg: #fdfdff;
   --card: #ffffff;
   --text: #111827;
   --muted: #6b7280;
-  --border: #d8dce6;         /* 边框更清晰一点 */
-  --radius: 10px;            /* 圆角更小 */
+  --border: #d8dce6;
+  --radius: 10px;
   --radius-sm: 8px;
+
+  /* layout */
+  --container: 1100px;
+  --gutter: 20px; /* single source of truth for left/right alignment */
 }
 
 *{ box-sizing: border-box; }
@@ -17,33 +24,51 @@ body{
   color: var(--text);
 }
 
-.shell{ min-height: 100vh; }
+.muted{ color: var(--muted); }
+.small{ font-size: 12px; }
 
-/* top bar */
+/* =========================
+   LAYOUT HELPERS (ALIGNMENT)
+   ========================= */
+.container{
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+/* =========================
+   TOP BAR
+   ========================= */
 .topbar{
   position: sticky;
   top: 0;
-  background: #fdfdff;              /* 去掉玻璃质感 */
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   z-index: 10;
 }
+
 .topbar-inner{
-  max-width: 1100px;
+  /* unified alignment with the rest of the page */
+  max-width: var(--container);
   margin: 0 auto;
-  padding: 16px 20px;
+  padding: 16px var(--gutter);
+
   display:flex;
   align-items:center;
   justify-content:center; /* title居中 */
   position: relative;
 }
+
 .app-title{
   font-weight: 900;
   letter-spacing: 0.2px;
   font-size: 20px;
 }
+
 .topbar-right{
   position: absolute;
-  right: 20px;
+  right: var(--gutter);
   display:flex;
   align-items:center;
   gap: 12px;
@@ -66,24 +91,36 @@ body{
   color: #374151;
 }
 
-/* main layout */
+/* =========================
+   MAIN
+   ========================= */
 .main{
-  max-width: 1100px;
+  /* main is a grid wrapper; alignment is handled by .container */
+  max-width: var(--container);
   margin: 0 auto;
-  padding: 24px 20px 50px;
+  padding: 24px var(--gutter) 50px;
   display: grid;
   gap: 18px;
 }
 
-/* cards - 去阴影、圆角变小、边框更整齐 */
+/* =========================
+   CARD
+   ========================= */
 .card{
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: none;                 /* ✅ 去阴影 */
+  box-shadow: none;
+  overflow: hidden; /* prevent inside elements overflow */
 }
 
-/* profile card */
+.card-body{
+  padding: 22px 22px;
+}
+
+/* =========================
+   PROFILE CARD
+   ========================= */
 .profile-card{
   padding: 24px 22px;
   text-align: center;
@@ -93,7 +130,7 @@ body{
   width: 56px;
   height: 56px;
   margin: 0 auto 12px;
-  border-radius: var(--radius-sm);  /* ✅ 小圆角 */
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   display:grid;
   place-items:center;
@@ -106,6 +143,7 @@ body{
   font-size: 28px;
   font-weight: 900;
 }
+
 .bio{
   margin: 10px auto 18px;
   max-width: 620px;
@@ -124,15 +162,16 @@ body{
 
 .stat{
   border: 1px solid var(--border);
-  border-radius: var(--radius);     /* ✅ 小圆角一致 */
+  border-radius: var(--radius);
   padding: 14px 12px;
-  background: #ffffff;              /* 更平面 */
+  background: #ffffff;
 }
 
 .stat-num{
   font-size: 20px;
   font-weight: 900;
 }
+
 .stat-label{
   margin-top: 4px;
   font-size: 12px;
@@ -148,15 +187,19 @@ body{
   flex-wrap: wrap;
 }
 
-/* buttons */
+/* =========================
+   BUTTONS
+   ========================= */
 .btn{
   border: 1px solid var(--border);
   background: #ffffff;
   padding: 10px 14px;
-  border-radius: 10px;              /* ✅ 更不圆 */
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 800;
   color: #111827;
+  text-decoration: none; /* remove underline for <a> */
+  display: inline-block;
 }
 .btn:hover{ background: #f3f4f6; }
 
@@ -167,30 +210,51 @@ body{
 }
 .btn.primary:hover{ background: #1d4ed8; }
 
+.btn.secondary{
+  background: #ffffff;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn.secondary:hover{ background: #f3f4f6; }
+
+.btn.danger{
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+.btn.danger:hover{ background: #dc2626; }
+
 .btn.tiny{
   padding: 10px 12px;
   border-radius: 10px;
   font-size: 12px;
-  width: 100%;                      /* ✅ folder里的Open按钮整齐铺满 */
+  width: 100%;
 }
 
-/* section header */
+.btn + .btn{ margin-left: 8px; }
+
+/* =========================
+   SECTION HEADERS
+   ========================= */
 .section-head{
   display:flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 2px 8px;
+
+  /* IMPORTANT: no horizontal padding here; container handles alignment */
+  padding: 10px 0 8px;
 }
+
 .section-title{
   margin: 0;
   font-size: 18px;
   font-weight: 900;
 }
-.muted{ color: var(--muted); }
-.small{ font-size: 12px; }
 
-/* folder grid */
+/* =========================
+   FOLDERS GRID
+   ========================= */
 .folder-grid{
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -201,8 +265,11 @@ body{
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: none;                 /* ✅ 去阴影 */
-  padding: 16px;
+  box-shadow: none;
+
+  /* slightly cleaner spacing */
+  padding: 18px 18px 16px;
+
   display:flex;
   flex-direction: column;
   gap: 10px;
@@ -214,6 +281,7 @@ body{
   justify-content: space-between;
   gap: 10px;
 }
+
 .folder-name{
   font-weight: 900;
   font-size: 16px;
@@ -229,13 +297,230 @@ body{
   color: #374151;
 }
 
-/* responsive */
+/* =========================
+   SEARCH
+   ========================= */
+.search-form{
+  display:flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.search-input{
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 16px;
+  background: #fff;
+}
+
+.search-input:focus{
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+/* =========================
+   LIST ROWS (posters + results)
+   ========================= */
+.poster-row,
+.movie-row{
+  display:flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+}
+
+.poster-row:hover,
+.movie-row:hover{ background: #f3f4f6; }
+
+.poster{
+  width: 80px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #f3f4f6;
+}
+
+.poster-info{ flex: 1; }
+.poster-title{ font-weight: 900; }
+
+.movie-row{ justify-content: space-between; }
+.movie-main{ flex: 1; }
+
+.movie-title-row{
+  display:flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.movie-side{
+  text-align: right;
+  min-width: 90px;
+}
+
+.stars{ font-weight: 900; }
+
+/* =========================
+   MOVIE DETAIL
+   ========================= */
+.detail-top{
+  display:flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.poster-lg{
+  width: 120px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #f3f4f6;
+  flex: 0 0 auto;
+}
+
+.movie-title{
+  margin: 0 0 6px 0;
+  line-height: 1.2;
+}
+
+.meta{
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.meta div{ line-height: 1.35; }
+
+.big-rating{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* =========================
+   COMMENTS
+   ========================= */
+.comment{
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.comment-author{ font-weight: 900; }
+
+.comment-text{
+  margin: 10px 0 0 0;
+  line-height: 1.5;
+}
+
+.like-btn{
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-weight: 800;
+}
+.like-btn:hover{ background: #f3f4f6; }
+
+/* =========================
+   KARA COMPAT HELPERS
+   ========================= */
+.row{ display: flex; align-items: center; }
+.gap{ gap: 10px; }
+.space-between{ justify-content: space-between; }
+
+.label{
+  font-weight: 800;
+  display: block;
+  margin: 10px 0 6px;
+}
+
+.input,
+select.input,
+textarea.input{
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 16px;
+}
+
+textarea.input{
+  resize: vertical;
+  min-height: 110px;
+}
+
+.input:focus{
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+/* =========================
+   ADD MOVIE
+   ========================= */
+.stack-form form{ margin-top: 14px; }
+
+.stack-form label,
+.stack-form .label{
+  display: block;
+  font-weight: 800;
+  margin: 12px 0 6px;
+}
+
+.stack-form input[type="text"],
+.stack-form input[type="number"],
+.stack-form input[type="url"],
+.stack-form input[type="email"],
+.stack-form select,
+.stack-form textarea,
+.stack-form .input{
+  width: 100%;
+  display: block;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 16px;
+}
+
+.stack-form textarea{
+  min-height: 120px;
+  resize: vertical;
+}
+
+.stack-form .form-actions{
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
 @media (max-width: 900px){
   .folder-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
 @media (max-width: 620px){
   .stats{ grid-template-columns: 1fr; }
   .folder-grid{ grid-template-columns: 1fr; }
+
   .topbar-right{ right: 12px; }
   .topbar-inner{ padding: 14px 12px; }
+
+  .main{ padding-left: 12px; padding-right: 12px; }
+
+  .detail-top{ flex-direction: column; }
+  .poster-lg{ width: 100%; height: auto; max-height: 240px; }
+  .row.space-between{ align-items: flex-start; }
 }
