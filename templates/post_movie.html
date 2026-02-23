@@ -3,10 +3,12 @@
 {% block content %}
  
 <div style="text-align: center;">
-  <h2 style="margin-bottom: 0;">Post Your Film</h2>
+  <h2 style="margin-bottom: 0;">{{ "Edit Your Film" if movie else "Post Your Film" }}</h2>
+  {% if not movie %}
   <p class="muted" style="margin-top: 0px;">
     Post a film that you wrote/directed.
   </p>
+  {% endif %}
 </div>
 
 <section class="card">
@@ -14,19 +16,67 @@
   <form method="POST" class="stack-form" action="/post">
 
     <label class="label" for="title">Movie Title *</label>
-    <input class="input" id="title" name="title" type="text" placeholder="e.g., Dune" required>
+    <input 
+      class="input" 
+      id="title" 
+      name="title" 
+      type="text"
+      value="{{ movie.title|default('') }}"
+      placeholder="e.g. Dune" 
+      required>
+
+    <label class="label" for="year">Release Year *</label>
+    <input 
+      class="input" 
+      id="year" 
+      name="year" 
+      type="text"
+      value="{{ movie.year|default('') }}" 
+      placeholder="e.g. 2026" 
+      required>
 
     <label class="label" for="genre">Genre</label>
-    <input class="input" id="genre" name="genre" type="text" placeholder="e.g., Sci-Fi, Drama">
+    <input 
+      class="input" 
+      id="genre" 
+      name="genre" 
+      type="text" 
+      value="{{ movie.genre|default('') }}" 
+      placeholder="e.g. Sci-Fi, Drama">
 
     <label class="label" for="logline">Log Line</label>
-    <textarea class="input" id="logline" name="logline" rows="2" placeholder="one sentence summary (remember to 'hook' your audience)"></textarea>
+    <textarea 
+      class="input" 
+      id="logline" 
+      name="logline" 
+      rows="2" 
+      placeholder="one sentence summary (remember to 'hook' your audience)">{{ movie.logline|default('') }}</textarea>
+
+    <label class="label" for="runtime">Runtime</label>
+    <input 
+      class="input" 
+      id="runtime" 
+      name="runtime" 
+      type="text" 
+      value="{{ movie.runtime|default('') }}" 
+      placeholder="e.g. 20 min">
 
     <label class="label" for="cast">Cast (comma-separated)</label>
-    <input class="input" id="cast" name="cast" type="text" placeholder="e.g., Timothée Chalamet, Zendaya">
+    <input 
+      class="input" 
+      id="cast" 
+      name="cast" 
+      type="text" 
+      value="{% for m in movie.cast %}{{ m.role }}: {{ m.name }}{% if not loop.last %}, {% endif %}{% endfor %}"
+      placeholder="e.g., Timothée Chalamet, Zendaya">
 
     <label class="label" for="crew">Crew (comma-separated)</label>
-    <input class="input" id="crew" name="crew" type="text" placeholder="e.g., Cinematographer: Greig Fraser">
+    <input 
+      class="input" 
+      id="crew" name="crew" 
+      type="text" 
+      value="{% for m in movie.crew %}{{ m.role }}: {{ m.name }}{% if not loop.last %}, {% endif %}{% endfor %}"
+      placeholder="e.g., Cinematographer: Greig Fraser">
 
     <label class="label" for="poster">Poster</label>
     <input class="input" type="file" id="poster" name="poster" accept="image/*">
@@ -38,12 +88,18 @@
     <input class="input" type="file" id="bts" name="bts" accept="image/*">
 
     <label class="label" for="awards">Awards (optional)</label>
-    <textarea class="input" id="awards" name="awards" rows="1" placeholder="List awards here"></textarea>
+    <textarea 
+      class="input" 
+      id="awards" 
+      name="awards" 
+      rows="1" 
+      placeholder="List awards here">{{ movie.awards|default('', true) }}</textarea>
 
-    <label class="label" for="pn">Production Notes (optional)</label>
-    <textarea class="input" id="pn" name="pn" rows="3" placeholder="Share production details, fun facts, etc."></textarea>
-
-    <button class="btn primary" type="post" style="margin-top: 20px;">Post Film</button>
+    {% if movie %}
+      <button class="btn primary" type="post" style="margin-top: 20px;">Save Changes</button>
+    {% else %}
+      <button class="btn primary" type="post" style="margin-top: 20px;">Post Film</button>
+    {% endif %}
     <a class="btn secondary" href="/">Cancel</a>
 
   </form>

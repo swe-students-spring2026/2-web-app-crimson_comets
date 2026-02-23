@@ -110,6 +110,7 @@ body{
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  padding: 2px 22px;
   box-shadow: none;
   overflow: hidden; /* prevent inside elements overflow */
 }
@@ -402,6 +403,7 @@ body{
   align-items:center;
   justify-content: space-between;
   gap: 12px;
+  padding: 12px 2px;
 }
 
 /* =========================
@@ -409,11 +411,13 @@ body{
    ========================= */
 .comment{
   border-top: 1px solid var(--border);
-  padding-top: 12px;
+  padding: 8px 20px;
   margin-top: 12px;
 }
 
-.comment-author{ font-weight: 900; }
+.comment-author{ 
+  font-weight: 900; 
+}
 
 .comment-text{
   margin: 10px 0 0 0;
@@ -429,6 +433,44 @@ body{
   font-weight: 800;
 }
 .like-btn:hover{ background: #f3f4f6; }
+
+.reply-box{
+  display: inline;
+  margin-left: 8px;
+}
+
+.reply-box summary{
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-weight: 800;
+  display: inline-block;
+  list-style: none;
+}
+
+.reply-box summary:hover{ background: #e6e6e7; }
+
+.reply-box textarea{
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.reply-box button{
+  margin-top: 8px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent, #007bff);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 800;
+}
 
 /* =========================
    KARA COMPAT HELPERS
