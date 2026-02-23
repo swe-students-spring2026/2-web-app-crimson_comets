@@ -151,7 +151,15 @@ def create_app():
         
         return render_template("post_movie.html", user=current_user)
 
+    # ---------- Folders (Harrison) ----------
+    @app.get("/folders")
+    @login_required
+    def folders():
+        return render_template("folders.html", user=current_user)
+
     return app
+
+
 
 
 app = create_app()
