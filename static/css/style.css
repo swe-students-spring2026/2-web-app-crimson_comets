@@ -239,3 +239,103 @@ body{
   .topbar-right{ right: 12px; }
   .topbar-inner{ padding: 14px 12px; }
 }
+
+/* ===== SEARCH ===== */
+
+.search-form{
+  display:flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.search-input{
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 16px;
+  background: #fff;
+}
+
+.search-input:focus{
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+/* ===== POSTER LIST (Home Hot Movies / Results) ===== */
+
+.poster-row{
+  display:flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+}
+
+.poster-row:hover{ background: #f3f4f6; }
+
+.poster{
+  width: 80px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #f3f4f6;
+}
+
+.poster-info{ flex: 1; }
+.poster-title{ font-weight: 900; }
+
+/* ===== MOVIE RESULT ROW ===== */
+
+.movie-row{
+  display:flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+}
+
+.movie-row:hover{ background: #f3f4f6; }
+
+.movie-main{ flex: 1; }
+
+.movie-title-row{
+  display:flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.movie-side{
+  text-align: right;
+  min-width: 90px;
+}
+
+.stars{ font-weight: 900; }
+
+/* ===== MOVIE DETAIL (just in case) ===== */
+
+.detail-top{
+  display:flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.poster-lg{
+  width: 120px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #f3f4f6;
+}
+
+.meta{
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+}
