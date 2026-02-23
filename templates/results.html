@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+
+<button type="button" onclick="history.back()" class="btn secondary">← Back</button>
+
+<section class="card">
+  <div class="card-body">
+  <h2>Search Results</h2>
+
+  <p class="muted">
+    Results for “<strong>{{ query or 'dune' }}</strong>”
+  </p>
+
+  <form action="/search" method="GET" class="search-form">
+    <input
+      type="text"
+      name="q"
+      class="search-input"
+      placeholder="Search by title, director, or actor"
+      value="{{ query or '' }}"
+    >
+    <button type="submit" class="btn primary">Search</button>
+  </form>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-body">
+  <h3>Movies</h3>
+
+  <a class="movie-row" href="/movie/1">
+    <div class="movie-main">
+      <div class="movie-title-row">
+        <span class="movie-title">Dune</span>
+        <span class="muted">(2021)</span>
+      </div>
+      <div class="muted small">Director: Denis Villeneuve</div>
+      <div class="muted small">Cast: Timothée Chalamet, Zendaya</div>
+    </div>
+
+    <div class="movie-side">
+      <div class="stars">⭐ 4.4</div>
+      <div class="muted small">123 ratings</div>
+    </div>
+  </a>
+
+  <a class="movie-row" href="/movie/2">
+    <div class="movie-main">
+      <div class="movie-title-row">
+        <span class="movie-title">Barbie</span>
+        <span class="muted">(2023)</span>
+      </div>
+      <div class="muted small">Director: Greta Gerwig</div>
+      <div class="muted small">Cast: Margot Robbie, Ryan Gosling</div>
+    </div>
+
+    <div class="movie-side">
+      <div class="stars">⭐ 4.1</div>
+      <div class="muted small">88 ratings</div>
+    </div>
+  </a>
+
+  <a class="movie-row" href="/movie/3">
+    <div class="movie-main">
+      <div class="movie-title-row">
+        <span class="movie-title">Inception</span>
+        <span class="muted">(2010)</span>
+      </div>
+      <div class="muted small">Director: Christopher Nolan</div>
+      <div class="muted small">Cast: Leonardo DiCaprio, Joseph Gordon-Levitt</div>
+    </div>
+
+    <div class="movie-side">
+      <div class="stars">⭐ 4.7</div>
+      <div class="muted small">540 ratings</div>
+    </div>
+  </a>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-body">
+  <h3>Can’t find what you’re looking for?</h3>
+  <p class="muted">
+    Add a new movie entry. Submissions may be reviewed before appearing publicly.
+  </p>
+  <a class="btn secondary" href="/movies/new">+ Add Movie</a>
+  </div>
+</section>
+
+{% endblock %}
