@@ -59,14 +59,14 @@
         </div>
 
         <div class="actions">
-          <button class="btn primary" type="button">Movie Search</button>
           <button class="btn" type="button">Manage Folders</button>
         </div>
       </section>
     {% endif %}
 
-    <!-- ✅ Your Search Module (shared for all roles) -->
+    <!--  Search Module (shared for all roles) -->
     <section class="card">
+      <div class="card-body">
       <h2 class="section-title">Search Movies</h2>
 
       <form action="/search" method="GET" class="search-form">
@@ -82,10 +82,12 @@
       <p class="muted small" style="margin-top:10px;">
         Can’t find a movie? Search first — if there’s no match, you’ll see an option to add it.
       </p>
+      </div>
     </section>
 
-    <!-- ✅ Your Hot Movies Module (shared) -->
+    <!--  Hot Movies Module (shared) -->
     <section class="card">
+      <div class="card-body">
       <div class="section-head">
         <h2 class="section-title">Hot Movies</h2>
       </div>
@@ -107,6 +109,7 @@
           <div class="muted small">⭐ 4.1</div>
         </div>
       </a>
+      </div>
     </section>
 
     {% if user.role == "filmmaker" %}
