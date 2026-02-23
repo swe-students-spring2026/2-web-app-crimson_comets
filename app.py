@@ -140,10 +140,6 @@ def create_app():
         return render_template("add_movie.html", user=current_user)
 
 
-    if __name__ == "__main__":
-        app.run(debug=True)
-
-
     # ---------- Post Film (Ginny) ----------
     @app.route("/post", methods=["GET", "POST"])
     @login_required
@@ -163,4 +159,4 @@ app = create_app()
 if __name__ == "__main__":
     FLASK_PORT = os.getenv("FLASK_PORT", "5000")
 
-    app.run(port=FLASK_PORT)
+    app.run(port=FLASK_PORT, debug=True)
