@@ -4,15 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ title or "Movie App" }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   </head>
 
   <body>
+    <!-- Top bar (Roger style) -->
     <header class="topbar">
-      <a class="app-title" href="/">🎬 Movie App</a>
+      <div class="topbar-inner">
+        <div class="app-title">Movie App</div>
+
+        <div class="topbar-right">
+          {% if current_user.is_authenticated %}
+            <span class="pill">{{ current_user.role|upper }}</span>
+            <a class="link" href="{{ url_for('logout') }}">Logout</a>
+          {% endif %}
+        </div>
+      </div>
     </header>
 
-    <main class="container">
+    <main class="main">
       {% block content %}{% endblock %}
     </main>
   </body>
