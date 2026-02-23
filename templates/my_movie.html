@@ -1,9 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div style="margin-bottom:10px;">
+<div style="margin-bottom:10px; display: flex;">
   <button onclick="history.back()" class="btn secondary">← Back</button>
+
+  <div class="row gap" style="margin-left: auto;">
+    <a href="{{ url_for('edit_my_movie', movie_id='1') }}">
+      <button class="btn secondary">Edit</button>
+      </a>
+
+    <a href="{{ url_for('edit_my_movie', movie_id='1') }}">
+      <button class="btn secondary">Delete</button>
+    </a>
+  </div>
 </div>
+
+
 
 <!-- TOP: poster + basic info -->
 <div class="detail-top card">
