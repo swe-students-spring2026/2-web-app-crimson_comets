@@ -494,7 +494,7 @@ textarea.input{
 }
 
 .stack-form textarea{
-  min-height: 120px;
+  min-height: 2px;
   resize: vertical;
 }
 

@@ -29,7 +29,9 @@
         </div>
 
         <div class="actions">
-          <button class="btn primary" type="button">+ Post Movie</button>
+          <a href="{{ url_for('post_movie') }}">
+            <button class="btn" type="button">+ Post Movie</button>
+          </a>
           <button class="btn" type="button">Browse My Movies</button>
           <button class="btn" type="button">Movie Search</button>
           <button class="btn" type="button">Manage Folders</button>
