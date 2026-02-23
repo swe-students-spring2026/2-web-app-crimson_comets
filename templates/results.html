@@ -4,6 +4,7 @@
 <button type="button" onclick="history.back()" class="btn secondary">← Back</button>
 
 <section class="card">
+  <div class="card-body">
   <h2>Search Results</h2>
 
   <p class="muted">
@@ -20,9 +21,11 @@
     >
     <button type="submit" class="btn primary">Search</button>
   </form>
+  </div>
 </section>
 
 <section class="card">
+  <div class="card-body">
   <h3>Movies</h3>
 
   <a class="movie-row" href="/movie/1">
@@ -72,14 +75,17 @@
       <div class="muted small">540 ratings</div>
     </div>
   </a>
+  </div>
 </section>
 
 <section class="card">
+  <div class="card-body">
   <h3>Can’t find what you’re looking for?</h3>
   <p class="muted">
     Add a new movie entry. Submissions may be reviewed before appearing publicly.
   </p>
   <a class="btn secondary" href="/movies/new">+ Add Movie</a>
+  </div>
 </section>
 
 {% endblock %}
