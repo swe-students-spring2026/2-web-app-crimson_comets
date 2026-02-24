@@ -4,7 +4,9 @@
 <div class="shell">
   <main class="main">
 
-
+    <a href="{{ url_for('home')}}">
+      <button class="btn secondary">Go Back To Home Page</button>
+    </a>
 
     <!-- Saved -->
     <section class="card">
@@ -16,21 +18,20 @@
         </div>
 
         <!-- List of Saved Movies. Tried to follow the card format from the homepage for Barbie and Dune -->
-        <a class="poster-row" href="#">
+
+        <a class="poster-row" href="/movie/1">
           <img class="poster" src="https://via.placeholder.com/80x120?text=Poster" alt="Dune poster">
           <div class="poster-info">
             <div class="poster-title">Dune <span class="muted">(2021)</span></div>
             <div class="muted small">Director: Denis Villeneuve</div>
-            
           </div>
         </a>
 
-        <a class="poster-row" href="#">
+        <a class="poster-row" href="/movie/2">
           <img class="poster" src="https://via.placeholder.com/80x120?text=Poster" alt="Barbie poster">
           <div class="poster-info">
             <div class="poster-title">Barbie <span class="muted">(2023)</span></div>
             <div class="muted small">Director: Greta Gerwig</div>
-            
           </div>
         </a>
 
