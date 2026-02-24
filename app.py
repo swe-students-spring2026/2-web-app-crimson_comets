@@ -45,9 +45,7 @@ def create_app():
     # ---------- Auth / entry ----------
     @app.get("/")
     def index():
-        if current_user.is_authenticated:
-            return redirect(url_for("login"))
-        return "User is not authenticated"
+        return redirect(url_for("login"))
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
