@@ -201,7 +201,15 @@ def create_app():
     def my_movie(movie_id):
         return render_template("my_movie.html", movie=DUMMY_MOVIE, comments=DUMMY_COMMENTS, user=current_user)
 
+    # ---------- Folders (Harrison) ----------
+    @app.get("/folders")
+    @login_required
+    def folders():
+        return render_template("folders.html", user=current_user)
+
     return app
+
+
 
 
 app = create_app()
