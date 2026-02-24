@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container narrow">
+  <div class="card">
+    <h1 class="h1">Welcome, {{ user.username }}!</h1>
+    <p class="muted">Let's set up your profile</p>
+
+    <form method="post" class="form">
+      <label class="label">Full Name</label>
+      <input class="input" name="full_name" placeholder="Enter your full name" />
+
+      <label class="label">Bio</label>
+      <textarea class="input" name="bio" placeholder="Tell us about yourself..." rows="4"></textarea>
+
+      <label class="label">I'm interested in:</label>
+      <div style="margin-bottom: 20px;">
+        <label class="checkbox">
+          <input type="checkbox" name="interests" value="action" />
+          <span>Action & Adventure</span>
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="interests" value="drama" />
+          <span>Drama</span>
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="interests" value="comedy" />
+          <span>Comedy</span>
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="interests" value="indie" />
+          <span>Indie Films</span>
+        </label>
+      </div>
+
+      <button class="btn primary" type="submit">Complete Setup</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

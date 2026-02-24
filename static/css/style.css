@@ -485,10 +485,48 @@ body{
 .gap{ gap: 10px; }
 .space-between{ justify-content: space-between; }
 
+.container.narrow{
+  max-width: 500px;
+}
+
+.form{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
 .label{
   font-weight: 800;
   display: block;
   margin: 10px 0 6px;
+}
+
+.checkbox,
+.radio{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  cursor: pointer;
+}
+
+.checkbox input,
+.radio input{
+  cursor: pointer;
+}
+
+.checkbox span,
+.radio span{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hint{
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
 }
 
 .input,

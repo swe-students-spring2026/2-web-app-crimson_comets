@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container narrow">
+  <div class="card">
+    <h1 class="h1">Create Account</h1>
+    <p class="muted">Join our movie community today</p>
+
+    <form method="post" class="form">
+      <label class="label">Username</label>
+      <input class="input" name="username" placeholder="Choose your username" required />
+
+      <label class="label">Account Type</label>
+      <div style="margin-bottom: 20px;">
+        <label class="checkbox">
+          <input type="checkbox" name="is_filmmaker" />
+          <span>I'm a filmmaker</span>
+          <span class="hint">Check this if you plan to post films</span>
+        </label>
+      </div>
+
+      <button class="btn primary" type="submit">Create Account</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+      <p class="muted" style="margin-bottom: 10px;">Already have an account?</p>
+      <a href="{{ url_for('login') }}" class="btn secondary">Log in</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
