@@ -203,6 +203,11 @@ def create_app():
     @login_required
     def folders():
         return render_template("folders.html", user=current_user)
+    
+    # ---------- Registers (Harrison) ---------
+    @app.route("/register")
+    def register():
+        return render_template("register.html")
 
     return app
 
