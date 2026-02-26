@@ -3,19 +3,26 @@
 <div class="container narrow">
   <div class="card">
     <h1 class="h1">Movie App</h1>
-    <p class="muted">Log in to your account</p>
+    <p class="muted">Dummy login for frontend demo.</p>
 
     <form method="post" class="form">
       <label class="label">Username</label>
-      <input class="input" name="username" placeholder="Enter your username" required />
+      <input class="input" name="username" placeholder="e.g. roger" />
+
+      <label class="label">Role</label>
+      <div class="row">
+        <label class="radio">
+          <input type="radio" name="role" value="user" checked />
+          <span>General User</span>
+        </label>
+        <label class="radio">
+          <input type="radio" name="role" value="filmmaker" />
+          <span>Filmmaker</span>
+        </label>
+      </div>
 
       <button class="btn primary" type="submit">Log in</button>
     </form>
-
-    <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-      <p class="muted" style="margin-bottom: 10px;">Don't have an account?</p>
-      <a href="{{ url_for('register') }}" class="btn secondary">Create an account</a>
-    </div>
   </div>
 </div>
 {% endblock %}

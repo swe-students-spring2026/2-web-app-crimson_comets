@@ -50,42 +50,17 @@ def create_app():
     @app.route("/login", methods=["GET", "POST"])
     def login():
         if request.method == "POST":
-            username = (request.form.get("username") or "").strip() or "roger_user"
-            # For login, default to existing user (general user)
-            user_obj = DUMMY_USERS["u1"]
+            role = request.form.get("role", "user")
+            username = (request.form.get("username") or "").strip() or (
+                "roger_user" if role == "user" else "roger_filmmaker"
+            )
+
+            user_obj = DUMMY_USERS["u1"] if role == "user" else DUMMY_USERS["f1"]
             user_obj.username = username
             login_user(user_obj)
             return redirect(url_for("home"))
 
         return render_template("login.html")
-
-
-    @app.route("/register", methods=["GET", "POST"])
-    def register():
-        if request.method == "POST":
-            username = (request.form.get("username") or "").strip() or "new_user"
-            is_filmmaker = request.form.get("is_filmmaker") == "on"
-            role = "filmmaker" if is_filmmaker else "user"
-            
-            # Create new user session and redirect to onboarding
-            user_obj = DummyUser(id="new_user_temp", username=username, role=role)
-            login_user(user_obj)
-            return redirect(url_for("onboarding"))
-
-        return render_template("register.html")
-
-
-    @app.route("/onboarding", methods=["GET", "POST"])
-    @login_required
-    def onboarding():
-        if request.method == "POST":
-            # Store onboarding info (dummy for now)
-            bio = request.form.get("bio", "")
-            full_name = request.form.get("full_name", "")
-            print(f"Onboarding: {full_name}, {bio}")
-            return redirect(url_for("home"))
-
-        return render_template("onboarding.html", user=current_user)
 
 
     @app.get("/logout")
@@ -228,40 +203,6 @@ def create_app():
     @login_required
     def folders():
         return render_template("folders.html", user=current_user)
-
-    
-    # ---------- Comments Display (Alan) ----------
-    @app.route("/comments")
-    @login_required
-    def comments_display():
-        # Display all comments of the current user
-        user_comments = [
-            {
-                "_id": "c1",
-                "author": current_user.username,
-                "movie_title": "The Great Adventure",
-                "time": "3 days ago",
-                "text": "This film was absolutely amazing! The cinematography was breathtaking.",
-                "likes": 12,
-            },
-            {
-                "_id": "c2",
-                "author": current_user.username,
-                "movie_title": "Summer Dreams",
-                "time": "1 week ago",
-                "text": "One of the best indie films I've seen. Highly recommend to everyone!",
-                "likes": 8,
-            },
-            {
-                "_id": "c3",
-                "author": current_user.username,
-                "movie_title": "Silent Nights",
-                "time": "2 weeks ago",
-                "text": "Slow pacing but the ending was worth it. Great acting.",
-                "likes": 5,
-            },
-        ]
-        return render_template("comment_display.html", comments=user_comments, user=current_user)
 
     return app
 
