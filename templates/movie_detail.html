@@ -8,16 +8,28 @@
 <!-- TOP: poster + basic info -->
 <div class="detail-top card">
   <img class="poster-lg"
-       src="https://via.placeholder.com/120x180?text=Poster"
-       alt="Poster">
+     src="{{ movie.poster or 'https://via.placeholder.com/120x180?text=Poster' }}"
+     alt="Poster">
 
   <div>
-    <h2 class="movie-title">Dune <span class="muted">(2021)</span></h2>
-    <p class="muted">Sci-Fi · 155 min</p>
+    <h2 class="movie-title">
+      {{ movie.title }}
+      {% if movie.year %}<span class="muted">({{ movie.year }})</span>{% endif %}
+    </h2>
+
+    <p class="muted">
+      {{ movie.genre or "" }}
+    </p>
 
     <div class="meta">
-      <div><span class="label">Director:</span> Denis Villeneuve</div>
-      <div><span class="label">Cast:</span> Timothée Chalamet, Zendaya, Rebecca Ferguson</div>
+      <div><span class="label">Director:</span> {{ movie.director }}</div>
+      <div><span class="label">Cast:</span>
+        {% if movie.cast and movie.cast|length > 0 %}
+          {{ movie.cast | join(", ") }}
+        {% else %}
+          -
+        {% endif %}
+      </div>
     </div>
   </div>
 </div>
@@ -25,43 +37,58 @@
 <!-- Rating summary -->
 <section class="rating-summary card">
   <div class="big-rating">
-    <div class="stars">⭐ 4.4 / 5</div>
-    <div class="muted">123 ratings</div>
-  </div>
-</section>
-
-<!-- YOUR RATING (dummy) -->
-<section class="card">
-  <h3>Your rating</h3>
-  <div class="row space-between">
-    <div><strong>5 / 5</strong></div>
-
-    <div class="row gap">
-      <a class="btn secondary" href="/movie/1/rating/edit">Edit</a>
-
-      <form method="POST" action="/movie/1/rating/delete">
-        <button class="btn danger" type="submit">Delete</button>
-      </form>
+    <div class="stars">
+      ⭐
+      {% if rating_summary and rating_summary.avg %}
+        {{ "%.1f"|format(rating_summary.avg) }} / 5
+      {% else %}
+        No ratings yet
+      {% endif %}
+    </div>
+    <div class="muted">
+      {{ rating_summary.count if rating_summary else 0 }} ratings
     </div>
   </div>
 </section>
 
-<!-- RATE MOVIE (dummy) -->
+<!-- YOUR RATING -->
+<section class="card">
+  <h3>Your rating</h3>
+
+  {% if your_rating %}
+    <div class="row space-between">
+      <div><strong>{{ your_rating.rating }} / 5</strong></div>
+
+      <div class="row gap">
+        <form method="POST" action="{{ url_for('rating_delete', movie_id=movie._id) }}">
+          <button class="btn danger" type="submit">Delete</button>
+        </form>
+      </div>
+    </div>
+  {% else %}
+    <p class="muted">You haven’t rated this movie yet.</p>
+  {% endif %}
+</section>
+
+<!-- RATE MOVIE -->
 <section class="card">
   <h3>Rate this movie</h3>
 
-  <form method="POST" action="/movie/1/rating">
+  <form method="POST" action="{{ url_for('rating_upsert', movie_id=movie._id) }}">
     <label class="label">Select rating</label>
-    <select name="rating" class="input">
+    <select name="rating" class="input" required>
       <option value="">Choose...</option>
-      <option value="1">1 - Terrible</option>
-      <option value="2">2 - Bad</option>
-      <option value="3">3 - OK</option>
-      <option value="4">4 - Good</option>
-      <option value="5">5 - Excellent</option>
+      {% for n in [1,2,3,4,5] %}
+        <option value="{{ n }}" {% if your_rating and your_rating.rating == n %}selected{% endif %}>
+          {{ n }}
+          {% if n == 1 %}- Terrible{% elif n == 2 %}- Bad{% elif n == 3 %}- OK{% elif n == 4 %}- Good{% else %}- Excellent{% endif %}
+        </option>
+      {% endfor %}
     </select>
 
-    <button class="btn primary" type="submit">Submit rating</button>
+    <button class="btn primary" type="submit">
+      {% if your_rating %}Update rating{% else %}Submit rating{% endif %}
+    </button>
   </form>
 </section>
 
@@ -69,56 +96,48 @@
 <section class="card">
   <h3>Top comments</h3>
 
+  {% for c in comments %}
   <div class="comment">
     <div class="row space-between">
       <div>
-        <div class="comment-author">alice</div>
-        <div class="muted small">2 days ago</div>
+        <div class="comment-author">{{ c.author_name }}</div>
+        <div class="muted small">
+          {{ c.created_at }}
+          {% if c.updated_at %}
+            <span class="muted small">(edited)</span>
+          {% endif %}
+        </div>
       </div>
 
-      <form method="POST" action="/movie/1/comments/c1/like">
-        <button class="like-btn" type="submit">👍 38</button>
+      <form method="POST" action="{{ url_for('comment_like', movie_id=movie._id, comment_id=c._id) }}">
+        <button class="like-btn" type="submit">👍 {{ c.likes }}</button>
       </form>
     </div>
 
-    <p class="comment-text">
-      Incredible cinematography and sound design. Slow pace but worth it.
-    </p>
-  </div>
+    <p class="comment-text">{{ c.content }}</p>
 
-  <div class="comment">
-    <div class="row space-between">
-      <div>
-        <div class="comment-author">kara (you)</div>
-        <div class="muted small">1 hour ago</div>
-      </div>
-
-      <form method="POST" action="/movie/1/comments/c2/like">
-        <button class="like-btn" type="submit">👍 4</button>
-      </form>
-    </div>
-
-    <p class="comment-text">
-      Loved the world-building. The visuals were stunning.
-    </p>
-
+    {% if c.author_id == (user.id|string) %}
     <div class="row gap">
-      <a class="btn secondary" href="/movie/1/comments/c2/edit">Edit</a>
+      <a class="btn secondary" href="{{ url_for('comment_edit', movie_id=movie._id, comment_id=c._id) }}">Edit</a>
 
-      <form method="POST" action="/movie/1/comments/c2/delete">
+      <form method="POST" action="{{ url_for('comment_delete', movie_id=movie._id, comment_id=c._id) }}">
         <button class="btn danger" type="submit">Delete</button>
       </form>
     </div>
+    {% endif %}
   </div>
+  {% else %}
+    <p class="muted">No comments yet.</p>
+  {% endfor %}
 </section>
 
 <!-- Add comment -->
 <section class="card">
   <h3>Add a comment</h3>
 
-  <form method="POST" action="/movie/1/comments/new">
+  <form method="POST" action="{{ url_for('comment_new', movie_id=movie._id) }}">
     <label class="label">Your comment</label>
-    <textarea name="content" rows="4" class="input" placeholder="Write your thoughts..."></textarea>
+    <textarea name="content" rows="4" class="input" placeholder="Write your thoughts..." required></textarea>
 
     <button class="btn primary" type="submit">Post comment</button>
   </form>
