@@ -131,18 +131,23 @@
         </div>
 
         <div class="folder-grid">
-          {% for m in profile.my_movies %}
+          {% if profile.my_movies and profile.my_movies|length > 0 %}
+            {% for m in profile.my_movies %}
             <div class="folder-card">
               <div class="folder-top">
-                <div class="folder-name">{{ m.title }}</div>
-                <span class="chip">{{ m.status }}</span>
+                <div class="folder-name">
+                  {{ m.title }}
+                  {% if m.year %}<span class="muted">({{ m.year }})</span>{% endif %}
+                </div>
+                <span class="chip">{{ m.status or "published" }}</span>
               </div>
-              <div class="muted small">Views: {{ m.views }} · Comments: {{ m.comments }}</div>
-              <a href="{{ url_for('my_movie', movie_id='3') }}">
+              <div class="muted small">Comments: {{ m.comments_count }}</div>
+              <a href="{{ url_for('my_movie', movie_id=m._id) }}">
                 <button class="btn tiny" type="button">Open</button>
               </a>
             </div>
           {% endfor %}
+          {% endif %}
         </div>
       </section>
     {% endif %}
