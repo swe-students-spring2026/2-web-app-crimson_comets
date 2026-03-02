@@ -204,6 +204,15 @@ body{
 }
 .btn:hover{ background: #f3f4f6; }
 
+.login-register{
+  display: flex;
+  margin-top: 16px;
+  justify-content: center;
+  gap: 16px;
+}
+
+
+
 .btn.primary{
   background: #2563eb;
   border-color: #2563eb;
