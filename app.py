@@ -1,8 +1,12 @@
 import os
 from dataclasses import dataclass
-from dotenv import load_dotenv
+from datetime import datetime
 
-from flask import Flask, render_template, redirect, url_for, request
+from dotenv import load_dotenv
+from pymongo import MongoClient
+from bson import ObjectId
+
+from flask import Flask, render_template, redirect, url_for, request, abort, flash
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -13,6 +17,9 @@ from flask_login import (
 )
 
 load_dotenv()
+
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client[os.getenv("MONGO_DBNAME")]
 
 
 def create_app():
@@ -30,16 +37,29 @@ def create_app():
         username: str
         role: str
 
-
     DUMMY_USERS = {
         "u1": DummyUser(id="u1", username="roger_user", role="user"),
         "f1": DummyUser(id="f1", username="roger_filmmaker", role="filmmaker"),
     }
 
-
     @login_manager.user_loader
     def load_user(user_id: str):
         return DUMMY_USERS.get(user_id)
+
+
+    # ---------- Helpers ----------
+    def oid(s: str) -> ObjectId:
+        """Parse ObjectId or 404."""
+        try:
+            return ObjectId(s)
+        except Exception:
+            abort(404)
+
+    def split_csv(s: str):
+        """'a, b, c' -> ['a','b','c']"""
+        if not s:
+            return []
+        return [x.strip() for x in s.split(",") if x.strip()]
 
 
     # ---------- Auth / entry ----------
@@ -62,13 +82,11 @@ def create_app():
 
         return render_template("login.html")
 
-
     @app.get("/logout")
     @login_required
     def logout():
         logout_user()
         return redirect(url_for("login"))
-
 
     # ---------- Home ----------
     @app.get("/home")
@@ -90,7 +108,12 @@ def create_app():
                     {"name": "Cool stuff", "count": 6},
                 ],
                 "my_movies": [
-                    {"title": "My Short Film A", "status": "Published", "views": 3200, "comments": 210},
+                    {
+                        "title": "My Short Film A",
+                        "status": "Published",
+                        "views": 3200,
+                        "comments": 210,
+                    },
                 ],
             }
         else:
@@ -109,32 +132,249 @@ def create_app():
                 },
             }
 
-        return render_template("home.html", user=current_user, profile=profile_data)
+        latest_movies = list(db.movies.find().sort("created_at", -1).limit(10))    
+
+        movies = list(db.movies.find().sort("created_at", -1).limit(10))
+
+        return render_template(
+            "home.html",
+            user=current_user,
+            profile=profile_data,
+            movies=movies,
+        )
 
 
     # ---------- Search pages (Kara) ----------
     @app.get("/search")
     @login_required
     def search():
-        query = request.args.get("q", "")
-        return render_template("results.html", query=query, user=current_user)
+        query = request.args.get("q", "").strip()
+
+        movies = []
+        if query:
+            movies = list(db.movies.find({
+                "$or": [
+                    {"title": {"$regex": query, "$options": "i"}},
+                    {"genre": {"$regex": query, "$options": "i"}},
+                ]
+            }))
+
+        return render_template(
+            "results.html",
+            query=query,
+            movies=movies,
+            user=current_user,
+        )
 
 
-    @app.get("/movie/<movie_id>")
-    @login_required
-    def movie_detail(movie_id):
-        return render_template("movie_detail.html", movie_id=movie_id, user=current_user)
-
-
+    # ---------- Add pages (Kara) ----------
     @app.route("/movies/new", methods=["GET", "POST"])
     @login_required
     def add_movie():
         if request.method == "POST":
-            # dummy for now
-            print("Movie submitted (dummy).")
+            title = request.form.get("title", "").strip()
+            year_raw = request.form.get("year", "").strip()
+            genre = request.form.get("genre", "").strip()
+            director = request.form.get("director", "").strip()
+            poster = request.form.get("poster", "").strip()
+
+            cast_raw = request.form.get("cast", "").strip()
+            crew_raw = request.form.get("crew", "").strip()
+
+            synopsis = request.form.get("synopsis", "").strip()
+            reason = request.form.get("reason", "").strip()
+            bts = request.form.get("bts", "").strip()
+
+            if not title:
+                return "Movie Title is required", 400
+            if not director:
+                return "Director is required", 400
+
+            year = int(year_raw) if year_raw.isdigit() else None
+
+            movie_doc = {
+                "title": title,
+                "year": year,
+                "genre": genre or None,
+                "director": director,
+                "cast": split_csv(cast_raw),
+                "crew": split_csv(crew_raw),
+                "synopsis": synopsis or None,
+                "reason": reason or None,
+                "bts": bts or None,
+                "poster": poster or None,
+                "created_at": datetime.utcnow(),
+                "created_by": getattr(current_user, "id", None),
+            }
+
+            result = db.movies.insert_one(movie_doc)
+            print("Inserted movie:", result.inserted_id)
+
             return redirect(url_for("home"))
 
         return render_template("add_movie.html", user=current_user)
+
+
+    # ---------- Movie detail + comments + ratings (Kara) ----------
+    @app.get("/movie/<movie_id>")
+    @login_required
+    def movie_detail(movie_id):
+        movie = db.movies.find_one({"_id": oid(movie_id)})
+        if not movie:
+            abort(404)
+
+        comments = list(
+            db.comments.find({"movie_id": movie["_id"]}).sort("created_at", -1)
+        )
+
+
+        # --- ratings: your rating + summary (avg, count) ---
+        user_id = str(getattr(current_user, "id", ""))
+
+        your_rating = db.ratings.find_one({
+            "movie_id": movie["_id"],
+            "user_id": user_id,
+        })
+
+        agg = list(db.ratings.aggregate([
+            {"$match": {"movie_id": movie["_id"]}},
+            {"$group": {"_id": "$movie_id", "avg": {"$avg": "$rating"}, "count": {"$sum": 1}}},
+        ]))
+
+        rating_summary = {"avg": None, "count": 0}
+        if agg:
+            rating_summary["avg"] = agg[0]["avg"]
+            rating_summary["count"] = agg[0]["count"]
+
+        return render_template(
+            "movie_detail.html",
+            movie=movie,
+            comments=comments,
+            your_rating=your_rating,
+            rating_summary=rating_summary,
+            user=current_user,
+        )
+
+
+    @app.post("/movie/<movie_id>/rating")
+    @login_required
+    def rating_upsert(movie_id):
+        movie_obj_id = oid(movie_id)
+
+        rating_raw = request.form.get("rating", "").strip()
+        if not rating_raw.isdigit():
+            return "Rating must be 1-5", 400
+
+        rating_val = int(rating_raw)
+        if rating_val < 1 or rating_val > 5:
+            return "Rating must be 1-5", 400
+
+        user_id = str(getattr(current_user, "id", ""))
+        now = datetime.utcnow()
+
+        existing = db.ratings.find_one({"movie_id": movie_obj_id, "user_id": user_id})
+        if existing:
+            db.ratings.update_one(
+                {"_id": existing["_id"]},
+                {"$set": {"rating": rating_val, "updated_at": now}},
+            )
+        else:
+            db.ratings.insert_one({
+                "movie_id": movie_obj_id,
+                "user_id": user_id,
+                "rating": rating_val,
+                "created_at": now,
+                "updated_at": None,
+            })
+
+        return redirect(url_for("movie_detail", movie_id=movie_id))
+
+
+    @app.post("/movie/<movie_id>/rating/delete")
+    @login_required
+    def rating_delete(movie_id):
+        db.ratings.delete_one({
+            "movie_id": oid(movie_id),
+            "user_id": str(getattr(current_user, "id", "")),
+        })
+        return redirect(url_for("movie_detail", movie_id=movie_id))
+
+
+    @app.post("/movie/<movie_id>/comments/new")
+    @login_required
+    def comment_new(movie_id):
+        movie_obj_id = oid(movie_id)
+        content = request.form.get("content", "").strip()
+        if not content:
+            return "Comment cannot be empty", 400
+
+        doc = {
+            "movie_id": movie_obj_id,
+            "author_id": str(getattr(current_user, "id", "")),
+            "author_name": getattr(current_user, "username", "user"),
+            "content": content,
+            "likes": 0,
+            "created_at": datetime.utcnow(),
+            "updated_at": None,
+        }
+        db.comments.insert_one(doc)
+        return redirect(url_for("movie_detail", movie_id=movie_id))
+
+
+    @app.post("/movie/<movie_id>/comments/<comment_id>/like")
+    @login_required
+    def comment_like(movie_id, comment_id):
+        db.comments.update_one(
+            {"_id": oid(comment_id), "movie_id": oid(movie_id)},
+            {"$inc": {"likes": 1}},
+        )
+        return redirect(url_for("movie_detail", movie_id=movie_id))
+
+
+    @app.post("/movie/<movie_id>/comments/<comment_id>/delete")
+    @login_required
+    def comment_delete(movie_id, comment_id):
+        db.comments.delete_one(
+            {
+                "_id": oid(comment_id),
+                "movie_id": oid(movie_id),
+                "author_id": str(getattr(current_user, "id", "")),
+            }
+        )
+        return redirect(url_for("movie_detail", movie_id=movie_id))
+
+
+    @app.route("/movie/<movie_id>/comments/<comment_id>/edit", methods=["GET", "POST"])
+    @login_required
+    def comment_edit(movie_id, comment_id):
+        comment = db.comments.find_one(
+            {
+                "_id": oid(comment_id),
+                "movie_id": oid(movie_id),
+                "author_id": str(getattr(current_user, "id", "")),
+            }
+        )
+        if not comment:
+            abort(404)
+
+        if request.method == "POST":
+            content = request.form.get("content", "").strip()
+            if not content:
+                return "Comment cannot be empty", 400
+
+            db.comments.update_one(
+                {"_id": comment["_id"]},
+                {"$set": {"content": content, "updated_at": datetime.utcnow()}},
+            )
+            return redirect(url_for("movie_detail", movie_id=movie_id))
+
+        return render_template(
+            "comment_edit.html",
+            comment=comment,
+            movie_id=movie_id,
+            user=current_user,
+        )
+
 
     DUMMY_MOVIE = {
         "_id": 3,
@@ -212,11 +452,8 @@ def create_app():
     return app
 
 
-
-
 app = create_app()
 
 if __name__ == "__main__":
     FLASK_PORT = os.getenv("FLASK_PORT", "5000")
-
-    app.run(port=FLASK_PORT, debug=True)
+    app.run(port=int(FLASK_PORT), debug=True)
