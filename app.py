@@ -92,49 +92,49 @@ def create_app():
     @app.get("/home")
     @login_required
     def home():
-        user_id = str(current_user.id)
-        role = getattr(current_user, "role", "user")
-        movies = list(db.movies.find({"status": "published"}).sort("created_at", -1).limit(10))
-
         if getattr(current_user, "role", "user") == "filmmaker":
-            folders = list(db.folders.find({"user_id": user_id}))
-            for f in folders:
-                f["count"] = len(f.get("movie_ids", []))
-            my_movies = list(db.movies.find({"created_by": str(current_user.id)}).sort("created_at", -1))
-            for m in my_movies:
-                m["comments_count"] = db.comments.count_documents({
-                    "movie_id": m["_id"]
-                })
             profile_data = {
                 "display_name": current_user.username,
-                "bio": "Filmmaker profile.",
+                "bio": "Filmmaker profile (dummy). Post movies and track audience engagement.",
                 "stats": {
-                    "movies_posted": len(my_movies),
-                    "total_views": sum(m.get("views", 0) for m in my_movies),
-                    "total_comments": db.comments.count_documents({
-                        "author_id": user_id
-                    }),
+                    "movies_posted": 6,
+                    "total_views": 12840,
+                    "total_comments": 912,
+                    "avg_rating": 4.6,
                 },
-                "my_movies": my_movies,
-                "folders": folders
+                "folders": [
+                    {"name": "My Inspirations", "count": 9},
+                    {"name": "My Favorites", "count": 14},
+                    {"name": "Cool stuff", "count": 6},
+                ],
+                "my_movies": [
+                    {
+                        "title": "My Short Film A",
+                        "status": "Published",
+                        "views": 3200,
+                        "comments": 210,
+                    },
+                ],
             }
         else:
-            folders = list(db.folders.find({"user_id": user_id}))
-            for f in folders:
-                f["count"] = len(f.get("movie_ids", []))
-
             profile_data = {
                 "display_name": current_user.username,
-                "bio": "Movie lover profile.",
-                "folders": folders,
+                "bio": "Movie lover profile (dummy). Save films, organize folders, and write reviews.",
+                "folders": [
+                    {"name": "Watch Later", "count": 12},
+                    {"name": "Top Rated", "count": 8},
+                    {"name": "Comedy Nights", "count": 5},
+                ],
                 "stats": {
-                    "folders": len(folders),
-                    "saved_movies": sum(len(f.get("movie_ids", [])) for f in folders),
-                    "reviews_written": db.comments.count_documents({
-                        "author_id": user_id
-                    }),
+                    "folders": 3,
+                    "saved_movies": 25,
+                    "reviews_written": 4,
                 },
-            } 
+            }
+
+        latest_movies = list(db.movies.find().sort("created_at", -1).limit(10))    
+
+        movies = list(db.movies.find().sort("created_at", -1).limit(10))
 
         return render_template(
             "home.html",
@@ -358,46 +358,22 @@ def create_app():
             abort(404)
 
         if request.method == "POST":
-            title = request.form.get("title", "").strip()
-            year_raw = request.form.get("year", "").strip()
-            genre = request.form.get("genre", "").strip()
-            director = request.form.get("director", "").strip()
-            poster = request.form.get("poster", "").strip()
+            content = request.form.get("content", "").strip()
+            if not content:
+                return "Comment cannot be empty", 400
 
-            cast_raw = request.form.get("cast", "").strip()
-            crew_raw = request.form.get("crew", "").strip()
+            db.comments.update_one(
+                {"_id": comment["_id"]},
+                {"$set": {"content": content, "updated_at": datetime.utcnow()}},
+            )
+            return redirect(url_for("movie_detail", movie_id=movie_id))
 
-            synopsis = request.form.get("synopsis", "").strip()
-            reason = request.form.get("reason", "").strip()
-            bts = request.form.get("bts", "").strip()
-
-            if not title:
-                return "Movie Title is required", 400
-            if not director:
-                return "Director is required", 400
-
-            year = int(year_raw) if year_raw.isdigit() else None
-
-            movie_doc = {
-                "title": title,
-                "year": year,
-                "genre": genre or None,
-                "director": director,
-                "cast": split_csv(cast_raw),
-                "crew": split_csv(crew_raw),
-                "synopsis": synopsis or None,
-                "reason": reason or None,
-                "bts": bts or None,
-                "poster": poster or None,
-                "created_at": datetime.utcnow(),
-                "created_by": str(current_user.id),
-                "status": "published"
-            }
-
-            result = db.movies.insert_one(movie_doc)
-            print("Inserted movie:", result.inserted_id)
-
-            return redirect(url_for("home"))
+        return render_template(
+            "comment_edit.html",
+            comment=comment,
+            movie_id=movie_id,
+            user=current_user,
+        )
 
 
     DUMMY_MOVIE = {
