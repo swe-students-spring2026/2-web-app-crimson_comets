@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h3>Edit comment</h3>
+  <form method="POST">
+    <label class="label">Your comment</label>
+    <textarea class="input" name="content" rows="4">{{ comment.content }}</textarea>
+
+    <div class="row gap" style="margin-top:12px;">
+      <button class="btn primary" type="submit">Save</button>
+      <a class="btn secondary" href="{{ url_for('movie_detail', movie_id=movie_id) }}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
