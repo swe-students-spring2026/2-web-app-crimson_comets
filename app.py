@@ -92,49 +92,48 @@ def create_app():
     @app.get("/home")
     @login_required
     def home():
+        user_id = str(current_user.id)
+        movies = list(db.movies.find({"status": "published"}).sort("created_at", -1).limit(10))
+
         if getattr(current_user, "role", "user") == "filmmaker":
+            folders = list(db.folders.find({"user_id": user_id}))
+            for f in folders:
+                f["count"] = len(f.get("movie_ids", []))
+            my_movies = list(db.movies.find({"created_by": str(current_user.id)}).sort("created_at", -1))
+            for m in my_movies:
+                m["comments_count"] = db.comments.count_documents({
+                    "movie_id": m["_id"]
+                })
             profile_data = {
                 "display_name": current_user.username,
-                "bio": "Filmmaker profile (dummy). Post movies and track audience engagement.",
+                "bio": "Filmmaker profile.",
                 "stats": {
-                    "movies_posted": 6,
-                    "total_views": 12840,
-                    "total_comments": 912,
-                    "avg_rating": 4.6,
+                    "movies_posted": len(my_movies),
+                    "total_views": sum(m.get("views", 0) for m in my_movies),
+                    "total_comments": db.comments.count_documents({
+                        "author_id": user_id
+                    }),
                 },
-                "folders": [
-                    {"name": "My Inspirations", "count": 9},
-                    {"name": "My Favorites", "count": 14},
-                    {"name": "Cool stuff", "count": 6},
-                ],
-                "my_movies": [
-                    {
-                        "title": "My Short Film A",
-                        "status": "Published",
-                        "views": 3200,
-                        "comments": 210,
-                    },
-                ],
+                "my_movies": my_movies,
+                "folders": folders
             }
         else:
+            folders = list(db.folders.find({"user_id": user_id}))
+            for f in folders:
+                f["count"] = len(f.get("movie_ids", []))
+
             profile_data = {
                 "display_name": current_user.username,
-                "bio": "Movie lover profile (dummy). Save films, organize folders, and write reviews.",
-                "folders": [
-                    {"name": "Watch Later", "count": 12},
-                    {"name": "Top Rated", "count": 8},
-                    {"name": "Comedy Nights", "count": 5},
-                ],
+                "bio": "Movie lover profile.",
+                "folders": folders,
                 "stats": {
-                    "folders": 3,
-                    "saved_movies": 25,
-                    "reviews_written": 4,
+                    "folders": len(folders),
+                    "saved_movies": sum(len(f.get("movie_ids", [])) for f in folders),
+                    "reviews_written": db.comments.count_documents({
+                        "author_id": user_id
+                    }),
                 },
             }
-
-        latest_movies = list(db.movies.find().sort("created_at", -1).limit(10))    
-
-        movies = list(db.movies.find().sort("created_at", -1).limit(10))
 
         return render_template(
             "home.html",
