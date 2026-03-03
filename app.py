@@ -449,62 +449,6 @@ def create_app():
         
         return render_template("post_movie.html", movie=None, user=current_user)
 
-    @app.route("/post/save", methods=["GET", "POST"])
-    @login_required
-    def save_movie():
-        if request.method == "POST":
-            title = request.form.get('title')
-            year = request.form.get('year')
-            genre = request.form.get('genre')
-            director = current_user.username
-            logline = request.form.get('logline')
-            runtime = request.form.get('runtime')
-            cast = request.form.get('cast', '').split(',')
-            crew = request.form.get('crew', '').split(',')
-            awards = request.form.get('awards')
-
-            poster_file = request.files.get('poster')
-            stills_file = request.files.get('stills')
-            bts_file = request.files.get('bts')
-
-            poster_filename = None
-            stills_filename = None
-            bts_filename = None
-
-            if poster_file and poster_file.filename:
-                poster_file.save(f'images/movie_photos/{poster_file.filename}')
-                poster_filename = poster_file.filename
-            if stills_file and stills_file.filename:
-                stills_file.save(f'images/movie_photos/{stills_file.filename}')
-                stills_filename = stills_file.filename
-            if bts_file and bts_file.filename:
-                bts_file.save(f'images/movie_photos/{bts_file.filename}')
-                bts_filename = bts_file.filename
-
-            doc = {
-                "title": title,
-                "year": year,
-                "genre": genre,
-                "director": director,
-                "logline": logline,
-                "runtime": runtime,
-                "cast": cast,
-                "crew": crew,
-                "status": "not published",
-                "awards": awards,
-                "poster": poster_filename,
-                "stills": stills_filename,
-                "bts": bts_filename,
-                "created_by": str(current_user.id),
-                "created_at": datetime.utcnow(),
-            }
-            
-            db.movies.insert_one(doc)
-                
-            return redirect(url_for("home"))
-        
-        return render_template("post_movie.html", movie=None, user=current_user)
-
     @app.route("/post/edit/<movie_id>", methods=["GET", "POST"])
     @login_required
     def edit_my_movie(movie_id):
