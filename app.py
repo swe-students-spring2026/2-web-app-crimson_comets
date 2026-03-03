@@ -97,7 +97,16 @@ def create_app():
     @login_required
     def home():
         user_id = str(current_user.id)
-        movies = list(db.movies.find({"status": "published"}).sort("created_at", -1).limit(10))
+        all_movies = list(db.movies.find())
+        for m in all_movies:
+            m["avg_rating"] = 0
+            m["comment_count"] = db.comments.count_documents({"movie_id": m["_id"]})
+            ratings = list(db.ratings.find({"movie_id": m["_id"]}))
+            if ratings:
+                m["avg_rating"] = sum(r["rating"] for r in ratings) / len(ratings)
+            m["trending_score"] = m["avg_rating"] * 2 + len(ratings) + m["comment_count"]
+
+        movies = sorted(all_movies, key=lambda x: x["trending_score"], reverse=True)[:3]
 
         if getattr(current_user, "role", "user") == "filmmaker":
             folders = list(db.folders.find({"user_id": user_id}))
