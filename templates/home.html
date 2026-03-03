@@ -11,7 +11,9 @@
       <section class="card profile-card">
         <div class="avatar">{{ profile.display_name[:1]|upper }}</div>
         <h1 class="username">{{ profile.display_name }}</h1>
-        <p class="bio">{{ profile.bio }}</p>
+        <p class="bio">{{ profile.bio }}
+          <a href="{{ url_for('edit_profile') }}" style="font-size:12px; color:#666; text-decoration:underline; margin-left:6px;">edit</a>
+        </p>
 
         <div class="stats">
           <div class="stat">
@@ -42,7 +44,9 @@
       <section class="card profile-card">
         <div class="avatar">{{ profile.display_name[:1]|upper }}</div>
         <h1 class="username">{{ profile.display_name }}</h1>
-        <p class="bio">{{ profile.bio }}</p>
+        <p class="bio">{{ profile.bio }}
+          <a href="{{ url_for('edit_profile') }}" style="font-size:12px; color:#666; text-decoration:underline; margin-left:6px;">edit</a>
+        </p>
 
         <div class="stats">
           <div class="stat">

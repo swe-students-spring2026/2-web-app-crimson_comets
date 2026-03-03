@@ -5,6 +5,14 @@
         <h1 class="h1">Movie App</h1>
         <p class="muted">Create Your Account</p>
 
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for msg in messages %}
+              <p style="color:red;">{{ msg }}</p>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
         <form method="POST" class="form">
             <label class="label">Username</label>
             <input class="input" name="username" placeholder="Enter username" required />
