@@ -14,10 +14,7 @@
         <div class="section-head">
           <h2 class="section-title">Saved</h2>
           <span class="chip">0 movies</span>
-          <!-- Hardcoded 25 movies for now. Will change when we integrate backend and db-->
         </div>
-
-        <!-- List of Saved Movies. Tried to follow the card format from the homepage for Barbie and Dune -->  
 
       </div>
     </section>
@@ -26,14 +23,35 @@
     <section class="section">
       <div class="section-head">
         <h2 class="section-title">Folders</h2>
-        <a href="{{ url_for('folders') }}" class="btn" role="button">Create Folder</a>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <a href="{{ url_for('create_folder') }}">
+          <button class="btn primary">Create Folder</button>
+        </a>
       </div>
 
       <div class="folder-grid">
+  {% if folders and folders|length > 0 %}
+    {% for f in folders %}
+      <div class="folder-card">
+        <div class="folder-top">
+          <div class="folder-name">{{ f.name }}</div>
+          <span class="chip">{{ f.count }} movies</span>
+        </div>
+        <div class="row" style="display:flex; gap:10px; margin-top:10px;">
+          <button class="btn tiny" type="button">Open</button>
 
-
+          <form method="POST" action="{{ url_for('delete_folder', folder_id=f._id) }}" style="margin:0;">
+            <button class="btn tiny" type="submit">Delete</button>
+          </form>
         </div>
       </div>
+    {% endfor %}
+  {% else %}
+    <p class="muted">No folders yet. Click <strong>Create Folder</strong> to add one.</p>
+  {% endif %}
+</div>
     </section>
 
   </main>
