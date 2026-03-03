@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container narrow">
+  <div class="card">
+
+    <h1 class="h1">Create Folder</h1>
+    <p class="muted">Give your new movie folder a name.</p>
+
+    <form method="POST" action="{{ url_for('create_folder') }}" class="form">
+      <label class="label">Folder Name</label>
+      <input class="input" type="text" name="name" placeholder="e.g. Rom Coms" required />
+
+      <div class="login-register">
+        <button class="btn primary" type="submit">Create Folder</button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}
