@@ -444,8 +444,11 @@ def create_app():
         return render_template("folders.html", user=current_user)
     
     # ---------- Registers (Harrison) ---------
-    @app.route("/register")
+    @app.route("/register", methods=["GET", "POST"])
     def register():
+
+        if request.method == "POST":
+            return redirect(url_for("login"))
         return render_template("register.html")
 
     return app
