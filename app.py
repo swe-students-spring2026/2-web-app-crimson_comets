@@ -5,6 +5,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from bson import ObjectId
+import hashlib
 
 from flask import Flask, render_template, redirect, url_for, request, session, abort, flash
 from flask_login import (
@@ -31,20 +32,19 @@ def create_app():
     login_manager.init_app(app)
 
 
-    @dataclass
-    class DummyUser(UserMixin):
-        id: str
-        username: str
-        role: str
-
-    DUMMY_USERS = {
-        "u1": DummyUser(id="u1", username="roger_user", role="user"),
-        "f1": DummyUser(id="f1", username="roger_filmmaker", role="filmmaker"),
-    }
+    class User(UserMixin):
+        def __init__(self, user_doc):
+            self.id = str(user_doc["_id"])
+            self.username = user_doc["username"]
+            self.role = user_doc.get("role", "user")
+            self.bio = user_doc.get("bio", "")
 
     @login_manager.user_loader
-    def load_user(user_id: str):
-        return DUMMY_USERS.get(user_id)
+    def load_user(user_id):
+        user_doc = db.users.find_one({"_id": ObjectId(user_id)})
+        if user_doc:
+            return User(user_doc)
+        return None
 
 
     # ---------- Helpers ----------
@@ -70,14 +70,18 @@ def create_app():
     @app.route("/login", methods=["GET", "POST"])
     def login():
         if request.method == "POST":
-            role = request.form.get("role", "user")
-            username = (request.form.get("username") or "").strip() or (
-                "roger_user" if role == "user" else "roger_filmmaker"
-            )
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "").strip()
 
-            user_obj = DUMMY_USERS["u1"] if role == "user" else DUMMY_USERS["f1"]
-            user_obj.username = username
-            login_user(user_obj)
+
+            user_doc = db.users.find_one({"username": username})
+            hashed_input = hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+            if not user_doc or hashed_input != user_doc["password"]:
+                flash("Invalid username or password.")
+                return redirect(url_for("login"))
+
+            login_user(User(user_doc))
             return redirect(url_for("home"))
 
         return render_template("login.html")
@@ -106,7 +110,7 @@ def create_app():
                 })
             profile_data = {
                 "display_name": current_user.username,
-                "bio": "Filmmaker profile.",
+                "bio": current_user.bio or "No bio yet.",
                 "stats": {
                     "movies_posted": len(my_movies),
                     "total_views": sum(m.get("views", 0) for m in my_movies),
@@ -124,7 +128,7 @@ def create_app():
 
             profile_data = {
                 "display_name": current_user.username,
-                "bio": "Movie lover profile.",
+                "bio": current_user.bio or "No bio yet.",
                 "folders": folders,
                 "stats": {
                     "folders": len(folders),
@@ -141,7 +145,20 @@ def create_app():
             profile=profile_data,
             movies=movies,
         )
+    # --------- Profile edit ----------
+    @app.route("/profile/edit", methods=["GET", "POST"])
+    @login_required
+    def edit_profile():
+        if request.method == "POST":
+            new_bio = request.form.get("bio", "").strip()
+            db.users.update_one(
+                {"_id": ObjectId(current_user.id)},
+                {"$set": {"bio": new_bio}}
+            )
+            flash("Profile updated!")
+            return redirect(url_for("home"))
 
+        return render_template("edit_profile.html", user=current_user)
 
     # ---------- Search pages (Kara) ----------
     @app.get("/search")
@@ -446,7 +463,7 @@ def create_app():
     @login_required
     def my_movie(movie_id):
         movie = db.movies.find_one({'_id': ObjectId(movie_id)})
-        comment = list(
+        comments = list(
             db.comments.find({"movie_id": ObjectId(movie_id)}).sort("created_at", -1)
         )
         return render_template("my_movie.html", movie=movie, comments=comments, user=current_user)
@@ -457,16 +474,33 @@ def create_app():
     def folders():
         return render_template("folders.html", user=current_user)
     
-    # ---------- Registers (Harrison) ---------
+    # ---------- Registers ---------
     @app.route("/register", methods=["GET", "POST"])
     def register():
-
         if request.method == "POST":
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "").strip()
+            role = request.form.get("role", "user")
+
+
+            if db.users.find_one({"username": username}):
+                flash("Username already exists.")
+                return redirect(url_for("register"))
+
+            hashed = hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+            db.users.insert_one({
+                "username": username,
+                "password": hashed,
+                "role": role,
+                "bio": "",
+                "created_at": datetime.utcnow(),
+            })
+
             return redirect(url_for("login"))
+
         return render_template("register.html")
-
     return app
-
 
 app = create_app()
 

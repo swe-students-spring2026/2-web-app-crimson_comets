@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container narrow">
+  <div class="card">
+    <h1 class="h1">Edit Profile</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for msg in messages %}
+          <p style="color:green;">{{ msg }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" class="form">
+      <label class="label">Bio</label>
+      <textarea class="input" name="bio" rows="4" placeholder="Tell us about yourself...">{{ user.bio }}</textarea>
+
+      <div style="margin-top:12px;">
+        <button class="btn primary" type="submit">Save</button>
+        <a href="{{ url_for('home') }}" class="btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
