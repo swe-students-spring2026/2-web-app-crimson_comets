@@ -155,7 +155,8 @@ body{
 /* stats */
 .stats{
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 200px));
+  justify-content: center;
   gap: 12px;
   margin: 0 auto 16px;
   max-width: 720px;
