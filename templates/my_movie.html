@@ -72,7 +72,7 @@
 <section class="card">
   <h3>Top comments</h3>
   {% for comment in comments %}
-  <div class="comment">
+  <div class="comment" id="comment-{{ comment.id }}">
     <div class="row space-between">
       <div>
         <div class="comment-author">{{ comment.author }}</div>
@@ -80,7 +80,11 @@
       </div>
 
       <form method="POST" action="/movie/{{ movie.id }}/comments/{{ comment.id }}/like">
-        <button class="like-btn" type="submit">👍 {{ comment.likes }}</button>
+        {% if user.id|string in comment.get('liked_by', []) %}
+          <button class="like-btn liked" type="submit">👍 {{ comment.likes }}</button>
+        {% else %}
+          <button class="like-btn" type="submit">👍 {{ comment.likes }}</button>
+        {% endif %}
       </form>
     </div>
 

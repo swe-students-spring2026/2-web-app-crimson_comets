@@ -449,6 +449,12 @@ body{
   font-weight: 800;
 }
 .like-btn:hover{ background: #f3f4f6; }
+.like-btn.liked{
+  background: #2563eb;
+  border-color: #1d4ed8;
+  color: #fff;
+}
+.like-btn.liked:hover{ background: #1d4ed8; }
 
 .reply-box{
   display: inline;
