@@ -109,10 +109,18 @@
 
                 <div class="muted small">
                   Director: {{ m.director or "-" }}
+                  {% if m.genre %} · {{ m.genre }}{% endif %}
                 </div>
 
-                <div class="muted small">
-                  {{ m.genre or "" }}
+                {% if m.reason %}
+                <div class="muted small" style="margin-top:4px; font-style:italic;">
+                  "{{ m.reason[:1000] }}{% if m.reason|length > 1000 %}...{% endif %}"
+                </div>
+                {% endif %}
+
+                <div class="muted small" style="margin-top:4px;">
+                  {% if m.avg_rating %}⭐ {{ "%.1f"|format(m.avg_rating) }}{% else %}No ratings{% endif %}
+                   · {{ m.comment_count }} comment{{ "s" if m.comment_count != 1 }}
                 </div>
               </div>
             </a>
