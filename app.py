@@ -400,7 +400,7 @@ def create_app():
             title = request.form.get('title')
             year = request.form.get('year')
             genre = request.form.get('genre')
-            director = session.get('username')
+            director = current_user.username
             logline = request.form.get('logline')
             runtime = request.form.get('runtime')
             cast = request.form.get('cast', '').split(',')
@@ -434,10 +434,13 @@ def create_app():
                 "runtime": runtime,
                 "cast": cast,
                 "crew": crew,
+                "status": "published",
                 "awards": awards,
                 "poster": poster_filename,
                 "stills": stills_filename,
                 "bts": bts_filename,
+                "created_by": str(current_user.id),
+                "created_at": datetime.utcnow(),
             }
             
             db.movies.insert_one(doc)
