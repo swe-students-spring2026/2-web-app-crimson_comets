@@ -474,6 +474,12 @@ def create_app():
     def edit_my_movie(movie_id):
         return render_template("post_movie.html", movie=DUMMY_MOVIE, user=current_user)
 
+    @app.route("/post/delete/<movie_id>")
+    @login_required
+    def delete_my_movie(movie_id):
+        db.movies.delete_one({"_id": ObjectId(movie_id)})
+        return redirect(url_for("home"))
+
     # ---------- My Movie (Ginny) ----------
     @app.route("/my-movie/<movie_id>")
     @login_required
