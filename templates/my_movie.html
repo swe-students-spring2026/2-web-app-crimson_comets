@@ -25,9 +25,11 @@
 
 <!-- TOP: poster + basic info -->
 <div class="detail-top card">
-  <img class="poster-lg"
-       src="{{ movie.poster }}"
-       alt="Poster">
+  {% if movie.poster %}
+    <img class="poster-lg"
+        src="{{ url_for('static', filename='movie_photos/' + movie.poster) }}"
+        alt="Poster">
+  {% endif %}
 
   <div>
     <h2 class="movie-title">{{ movie.title }} <span class="muted">({{ movie.year }})</span></h2>
@@ -74,6 +76,30 @@
   {% endfor %}
 </section>
 
+<!-- Stills -->
+{% if movie.stills %}
+  <section class="card">
+    <h3>Stills</h3>
+    {% for still in movie.stills %}
+      <img class="poster-lg"
+          src="{{ url_for('static', filename='movie_photos/' + still) }}"
+          alt="Stills">
+    {% endfor %}
+  </section>
+{% endif %}
+
+<!-- BTS -->
+{% if movie.bts %}
+  <section class="card">
+    <h3>BTS</h3>
+    {% for each_bts in movie.bts %}
+      <img class="poster-lg"
+          src="{{ url_for('static', filename='movie_photos/' + each_bts) }}"
+          alt="BTS">
+    {% endfor %}
+  </section>
+{% endif %}
+
 <!-- Comments -->
 <section class="card">
   <h3>Top comments</h3>
@@ -81,8 +107,13 @@
   <div class="comment" id="comment-{{ comment.id }}">
     <div class="row space-between">
       <div>
-        <div class="comment-author">{{ comment.author }}</div>
-        <div class="muted small">{{ comment.time }}</div>
+        <div class="comment-author">{{ comment.author_name }}</div>
+        <div class="muted small">
+          {{ comment.created_at }}
+          {% if comment.updated_at %}
+            <span class="muted small">(edited)</span>
+          {% endif %}
+        </div>
       </div>
 
       <form method="POST" action="/movie/{{ movie.id }}/comments/{{ comment.id }}/like">
@@ -94,13 +125,24 @@
       </form>
     </div>
 
-    <p class="comment-text">{{ comment.text }}</p>
+    <p class="comment-text">{{ comment.content }}</p>
 
     <details class="reply-box">
       <summary class="reply-btn">Reply</summary>
-      <textarea placeholder="Write a reply..."></textarea>
-      <button type="button">Post Reply</button>
+      <form method="POST" action="{{ url_for('reply_my_movie', movie_id= movie._id, comment_id=comment._id) }}">
+        <textarea name="reply" placeholder="Write a reply..."></textarea>
+        <button type="submit">Post Reply</button>        
+      </form>
     </details>
+
+    {% if comment.replies %}
+      <div class="comment-author">Director's Reply: </div>
+      {% for reply in comment.replies %}
+        <div class="reply">
+          <p>{{ reply }}</p>
+        </div>
+      {% endfor %}
+    {% endif %}
   </div>
   {% endfor %}
 </section>

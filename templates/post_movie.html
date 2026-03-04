@@ -23,7 +23,9 @@
 
 <section class="card">
   <div class="card-body">
-  <form method="POST" class="stack-form" action="/post" enctype="multipart/form-data">
+  <form method="POST" class="stack-form" 
+    action="{{ url_for('update_my_movie', movie_id=movie._id) if movie else url_for('post_movie') }}"
+    enctype="multipart/form-data">
 
     <label class="label" for="title">Movie Title *</label>
     <input 
@@ -77,7 +79,7 @@
       id="cast" 
       name="cast" 
       type="text" 
-      value="{% for m in movie.cast %}{{ m.role }}: {{ m.name }}{% if not loop.last %}, {% endif %}{% endfor %}"
+      value="{% for m in movie.cast %}{{ m.name }}: {{ m.role }}{% if not loop.last %}, {% endif %}{% endfor %}"
       placeholder="e.g., Timothée Chalamet, Zendaya">
 
     <label class="label" for="crew">Crew (comma-separated)</label>
@@ -85,17 +87,17 @@
       class="input" 
       id="crew" name="crew" 
       type="text" 
-      value="{% for m in movie.crew %}{{ m.role }}: {{ m.name }}{% if not loop.last %}, {% endif %}{% endfor %}"
-      placeholder="e.g., Cinematographer: Greig Fraser">
+      value="{% for m in movie.crew %}{{ m.name }}: {{ m.role }}{% if not loop.last %}, {% endif %}{% endfor %}"
+      placeholder="e.g., Greig Fraser: Cinematographer">
 
     <label class="label" for="poster">Poster</label>
     <input class="input" type="file" id="poster" name="poster" accept="image/*">
 
     <label class="label" for="stills">Film Stills</label>
-    <input class="input" type="file" id="stills" name="stills" accept="image/*">
+    <input class="input" type="file" id="stills" name="stills" accept="image/*" multiple>
 
     <label class="label" for="bts">BTS photos (optional)</label>
-    <input class="input" type="file" id="bts" name="bts" accept="image/*">
+    <input class="input" type="file" id="bts" name="bts" accept="image/*" multiple>
 
     <label class="label" for="awards">Awards (optional)</label>
     <textarea 
@@ -106,11 +108,11 @@
       placeholder="List awards here">{{ movie.awards|default('', true) }}</textarea>
 
     {% if movie %}
-      <button class="btn primary" type="post" style="margin-top: 20px;">Save Changes</button>
+      <button class="btn primary" type="submit"> Save Changes</button>
     {% else %}
       <button class="btn primary" type="submit" style="margin-top: 20px;">Post Film</button>
     {% endif %}
-    <a class="btn secondary" href="{{ url_for('home') }}">Cancel</a>
+      <a class="btn secondary" href="{{ url_for('home') }}">Cancel</a>
 
   </form>
   </div>

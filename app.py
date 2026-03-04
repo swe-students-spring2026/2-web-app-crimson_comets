@@ -4,6 +4,7 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from werkzeug.utils import secure_filename
 from bson import ObjectId
 import hashlib
 
@@ -21,6 +22,9 @@ load_dotenv()
 
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client[os.getenv("MONGO_DBNAME")]
+
+UPLOAD_FOLDER = 'static/movie_photos'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 def create_app():
@@ -112,7 +116,7 @@ def create_app():
             folders = list(db.folders.find({"user_id": user_id}))
             for f in folders:
                 f["count"] = len(f.get("movie_ids", []))
-            my_movies = list(db.movies.find({"created_by": str(current_user.id)}).sort("created_at", -1))
+            my_movies = list(db.movies.find({"created_by": ObjectId(current_user.id)}).sort("created_at", -1))
             for m in my_movies:
                 m["comments_count"] = db.comments.count_documents({
                     "movie_id": m["_id"]
@@ -438,27 +442,56 @@ def create_app():
             director = current_user.username
             logline = request.form.get('logline')
             runtime = request.form.get('runtime')
-            cast = request.form.get('cast', '').split(',')
-            crew = request.form.get('crew', '').split(',')
+
+            cast_input = request.form.get('cast', '').split(',')
+            cast = []
+            for each_cast in cast_input:
+                if ':' in each_cast:
+                    name, role = each_cast.split(':', 1)
+                    cast.append({
+                        "name": name.strip(),
+                        "role": role.strip()
+                    })
+
+            crew_input = request.form.get('crew', '').split(',')
+            crew = []
+            for each_crew in crew_input:
+                if ':' in each_crew:
+                    name, role = each_crew.split(':', 1)
+                    crew.append({
+                        'name': name.strip(),
+                        'role': role.strip()
+                    })
+
             awards = request.form.get('awards')
 
             poster_file = request.files.get('poster')
-            stills_file = request.files.get('stills')
-            bts_file = request.files.get('bts')
+            stills_files = request.files.getlist('stills')
+            bts_files = request.files.getlist('bts')
 
             poster_filename = None
-            stills_filename = None
-            bts_filename = None
+            stills_filenames = []
+            bts_filenames = []
 
             if poster_file and poster_file.filename:
-                poster_file.save(f'images/movie_photos/{poster_file.filename}')
-                poster_filename = poster_file.filename
-            if stills_file and stills_file.filename:
-                stills_file.save(f'images/movie_photos/{stills_file.filename}')
-                stills_filename = stills_file.filename
-            if bts_file and bts_file.filename:
-                bts_file.save(f'images/movie_photos/{bts_file.filename}')
-                bts_filename = bts_file.filename
+                filename = secure_filename(poster_file.filename)
+                unique_filename = f"{ObjectId()}_{filename}"
+                poster_file.save(f'static/movie_photos/{unique_filename}')
+                poster_filename = unique_filename
+
+            for still in stills_files:
+                if still and still.filename:
+                    filename = secure_filename(still.filename)
+                    unique_filename = f"{ObjectId()}_{filename}"
+                    still.save(f'static/movie_photos/{unique_filename}')
+                    stills_filenames.append(unique_filename)
+
+            for each_bts in bts_files:
+                if each_bts and each_bts.filename:
+                    filename = secure_filename(each_bts.filename)
+                    unique_filename = f"{ObjectId()}_{filename}"
+                    each_bts.save(f'static/movie_photos/{unique_filename}')
+                    bts_filenames.append(unique_filename)
 
             doc = {
                 "title": title,
@@ -472,9 +505,9 @@ def create_app():
                 "status": "published",
                 "awards": awards,
                 "poster": poster_filename,
-                "stills": stills_filename,
-                "bts": bts_filename,
-                "created_by": str(current_user.id),
+                "stills": stills_filenames,
+                "bts": bts_filenames,
+                "created_by": ObjectId(current_user.id),
                 "created_at": datetime.utcnow(),
             }
             
@@ -484,11 +517,92 @@ def create_app():
         
         return render_template("post_movie.html", movie=None, user=current_user)
 
-    @app.route("/post/edit/<movie_id>", methods=["GET", "POST"])
+    @app.route("/post/edit/<movie_id>", methods=["GET"])
     @login_required
     def edit_my_movie(movie_id):
         movie = db.movies.find_one({"_id": ObjectId(movie_id)})
         return render_template("post_movie.html", movie=movie, user=current_user)
+
+    @app.route("/post/edit/<movie_id>", methods=["POST"])
+    @login_required
+    def update_my_movie(movie_id):
+        title = request.form.get('title')
+        year = request.form.get('year')
+        genre = request.form.get('genre')
+        director = current_user.username
+        logline = request.form.get('logline')
+        runtime = request.form.get('runtime')
+
+        cast_input = request.form.get('cast', '').split(',')
+        cast = []
+        for each_cast in cast_input:
+            if ':' in each_cast:
+                name, role = each_cast.split(':', 1)
+                cast.append({
+                    "name": name.strip(),
+                    "role": role.strip()
+                })
+
+        crew_input = request.form.get('crew', '').split(',')
+        crew = []
+        for each_crew in crew_input:
+            if ':' in each_crew:
+                name, role = each_crew.split(':', 1)
+                crew.append({
+                    'name': name.strip(),
+                    'role': role.strip()
+                })
+
+        awards = request.form.get('awards')
+
+        poster_file = request.files.get('poster')
+        stills_files = request.files.getlist('stills')
+        bts_files = request.files.getlist('bts')
+
+        poster_filename = None
+        stills_filenames = []
+        bts_filenames = []
+
+        if poster_file and poster_file.filename:
+            filename = secure_filename(poster_file.filename)
+            unique_filename = f"{ObjectId()}_{filename}"
+            poster_file.save(f'static/movie_photos/{unique_filename}')
+            poster_filename = unique_filename
+
+        for still in stills_files:
+            if still and still.filename:
+                filename = secure_filename(still.filename)
+                unique_filename = f"{ObjectId()}_{filename}"
+                still.save(f'static/movie_photos/{unique_filename}')
+                stills_filenames.append(unique_filename)
+
+        for each_bts in bts_files:
+            if each_bts and each_bts.filename:
+                filename = secure_filename(each_bts.filename)
+                unique_filename = f"{ObjectId()}_{filename}"
+                each_bts.save(f'static/movie_photos/{unique_filename}')
+                bts_filenames.append(unique_filename)
+
+        doc = {
+            "title": title,
+            "year": year,
+            "genre": genre,
+            "director": director,
+            "logline": logline,
+            "runtime": runtime,
+            "cast": cast,
+            "crew": crew,
+            "status": "published",
+            "awards": awards,
+            "poster": poster_filename,
+            "stills": stills_filenames,
+            "bts": bts_filenames,
+            "created_by": ObjectId(current_user.id),
+            "created_at": datetime.utcnow(),
+        }
+        
+        db.movies.update_one({"_id": ObjectId(movie_id)}, {"$set": doc}) 
+        return redirect(url_for("home"))          
 
     @app.route("/post/delete/<movie_id>")
     @login_required
@@ -505,6 +619,14 @@ def create_app():
             db.comments.find({"movie_id": ObjectId(movie_id)}).sort("created_at", -1)
         )
         return render_template("my_movie.html", movie=movie, comments=comments, user=current_user)
+
+    @app.route("/my-movie/<movie_id>/<comment_id>", methods=["POST"])
+    @login_required
+    def reply_my_movie(movie_id, comment_id):
+        reply = request.form.get('reply')
+        db.comments.update_one({"_id": ObjectId(comment_id)}, {"$push": {"replies": reply}})
+        movie = db.movies.find_one({"_id": ObjectId(movie_id)})
+        return redirect(url_for('my_movie', movie_id=movie_id))
 
     # ---------- Folders (Harrison) ----------
     @app.route("/folders/new", methods=["GET", "POST"])
