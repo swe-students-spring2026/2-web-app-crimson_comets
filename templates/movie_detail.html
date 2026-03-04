@@ -8,13 +8,15 @@
 <!-- TOP: poster + basic info -->
 <div class="detail-top card">
   <img class="poster-lg"
-     src="{{ movie.poster or 'https://via.placeholder.com/120x180?text=Poster' }}"
-     alt="Poster">
+       src="{{ movie.poster or 'https://via.placeholder.com/120x180?text=Poster' }}"
+       alt="Poster">
 
   <div>
     <h2 class="movie-title">
       {{ movie.title }}
-      {% if movie.year %}<span class="muted">({{ movie.year }})</span>{% endif %}
+      {% if movie.year %}
+        <span class="muted">({{ movie.year }})</span>
+      {% endif %}
     </h2>
 
     <p class="muted">
@@ -23,7 +25,8 @@
 
     <div class="meta">
       <div><span class="label">Director:</span> {{ movie.director }}</div>
-      <div><span class="label">Cast:</span>
+      <div>
+        <span class="label">Cast:</span>
         {% if movie.cast and movie.cast|length > 0 %}
           {{ movie.cast | join(", ") }}
         {% else %}
@@ -31,6 +34,16 @@
         {% endif %}
       </div>
     </div>
+
+    {% if movie.synopsis %}
+      <div class="synopsis-block">
+        <span class="label">Synopsis:</span>
+        <p class="synopsis-text">
+          {{ movie.synopsis }}
+        </p>
+      </div>
+    {% endif %}
+
   </div>
 </div>
 
