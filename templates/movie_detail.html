@@ -12,12 +12,25 @@
        alt="Poster">
 
   <div>
-    <h2 class="movie-title">
-      {{ movie.title }}
-      {% if movie.year %}
-        <span class="muted">({{ movie.year }})</span>
-      {% endif %}
-    </h2>
+
+    <div class="row space-between">
+      <h2 class="movie-title">
+        {{ movie.title }}
+        {% if movie.year %}
+          <span class="muted">({{ movie.year }})</span>
+        {% endif %}
+      </h2>
+
+      <form method="POST" action="{{ url_for('movie_save_toggle', movie_id=movie._id) }}" style="margin:0;">
+        <button class="btn primary" type="submit">
+          {% if is_saved %} 
+            Saved
+          {% else %} 
+            Save
+          {% endif %}
+        </button>
+      </form>
+    </div>
 
     <p class="muted">
       {{ movie.genre or "" }}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container narrow">
+  <div style="margin-bottom:16px;">
+    <button onclick="history.back()" class="btn secondary">← Back</button>
+  </div>
+
+  <div class="card">
+    <h1 class="h1">Add to folder</h1>
+
+    <p class="muted" style="margin-bottom:12px;">
+      Choose a folder to add
+      {% if movie is defined and movie.title %}
+        <strong>{{ movie.title }}</strong>
+      {% elif movie_title is defined %}
+        <strong>{{ movie_title }}</strong>
+      {% else %}
+        this movie
+      {% endif %}
+      to.
+    </p>
+
+    <form method="POST" action="{{ url_for('add_to_folder', movie_id=movie._id if movie is defined else movie_id) }}" class="form">
+      <label class="label" for="folder_id">Select folder</label>
+
+      <select class="input" id="folder_id" name="folder_id" required>
+        <option value="" selected disabled>Choose a folder...</option>
+        {% if folders is defined and folders|length > 0 %}
+          {% for f in folders %}
+            <option value="{{ f._id }}">{{ f.name }}</option>
+          {% endfor %}
+        {% endif %}
+      </select>
+
+      {% if folders is not defined or folders|length == 0 %}
+        <p class="muted" style="margin-top:10px;">You don’t have any folders yet. Create one first.</p>
+      {% endif %}
+
+      <div style="margin-top:14px;">
+        <button class="btn primary" type="submit" style="width:100%;" {% if folders is not defined or folders|length == 0 %}disabled{% endif %}>
+          Add to folder
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

@@ -14,15 +14,36 @@
       <div class="card-body">
         <div class="section-head">
           <h2 class="section-title">Saved</h2>
-          <span class="chip">0 movies</span>
+          <span class="chip">{{ saved_movies|length if saved_movies is defined else 0 }} movies</span>
         </div>
+        <div class="folder-grid">
+          {% if saved_movies is defined and saved_movies|length > 0 %}
+            {% for m in saved_movies %}
+              <div class="folder-card">
+                <div class="folder-top">
+                  <div class="folder-name">{{ m.title }}{% if m.year %} ({{ m.year }}){% endif %}</div>
+                  <span class="chip">Saved</span>
+                </div>
+                {% if m.director %}
+                  <div class="muted small">Directed by {{ m.director }}</div>
+                {% endif %}
+                <div class="row" style="display:flex; gap:8px; margin-top:10px; align-items:center;">
+                  <a class="btn tiny" style="padding:6px 12px; width:auto;" href="{{ url_for('movie_detail', movie_id=m._id) }}">Open</a>
 
+                  <a class="btn tiny" style="padding:6px 12px; width:auto;" href="{{ url_for('add_to_folder', movie_id=m._id) }}">Add to Folder</a>
 
+                  <form method="POST" action="{{ url_for('remove_saved_movie', movie_id=m._id) }}" style="margin:0;">
+                    <button class="btn tiny" type="submit">Delete</button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="muted">No saved movies yet.</p>
+          {% endif %}
+        </div>
       </div>
     </section>
-
-  </main>
-</div>
 
     <!-- Folders -->
     <section class="section">
@@ -37,26 +58,26 @@
       </div>
 
       <div class="folder-grid">
-  {% if folders and folders|length > 0 %}
-    {% for f in folders %}
-      <div class="folder-card">
-        <div class="folder-top">
-          <div class="folder-name">{{ f.name }}</div>
-          <span class="chip">{{ f.count }} movies</span>
-        </div>
-        <div class="row" style="display:flex; gap:10px; margin-top:10px;">
-          <button class="btn tiny" type="button">Open</button>
+        {% if folders and folders|length > 0 %}
+          {% for f in folders %}
+            <div class="folder-card">
+              <div class="folder-top">
+                <div class="folder-name">{{ f.name }}</div>
+                <span class="chip">{{ f.count }} movies</span>
+              </div>
+              <div class="row" style="display:flex; gap:10px; margin-top:10px;">
+                <a class="btn tiny" href="{{ url_for('folder_page', folder_id=f._id) }}">Open</a>
 
-          <form method="POST" action="{{ url_for('delete_folder', folder_id=f._id) }}" style="margin:0;">
-            <button class="btn tiny" type="submit">Delete</button>
-          </form>
-        </div>
+                <form method="POST" action="{{ url_for('delete_folder', folder_id=f._id) }}" style="margin:0;">
+                  <button class="btn tiny" type="submit">Delete</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="muted">No folders yet. Click <strong>Create Folder</strong> to add one.</p>
+        {% endif %}
       </div>
-    {% endfor %}
-  {% else %}
-    <p class="muted">No folders yet. Click <strong>Create Folder</strong> to add one.</p>
-  {% endif %}
-</div>
     </section>
 
   </main>
