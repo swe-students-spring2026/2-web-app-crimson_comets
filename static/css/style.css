@@ -385,6 +385,15 @@ body{
 /* =========================
    MOVIE DETAIL
    ========================= */
+.synopsis-block {
+  margin-top: 12px;
+}
+
+.synopsis-text {
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
 .detail-top{
   display:flex;
   gap: 14px;
