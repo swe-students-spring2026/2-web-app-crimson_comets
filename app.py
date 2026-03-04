@@ -256,9 +256,11 @@ def create_app():
             db.comments.find({"movie_id": movie["_id"]}).sort("created_at", -1)
         )
 
-
-        # --- ratings: your rating + summary (avg, count) ---
         user_id = str(getattr(current_user, "id", ""))
+
+        saved_folder = db.folders.find_one({"user_id": user_id, "name": "Saved"})
+        saved_movie_ids = saved_folder.get("movie_ids", []) if saved_folder else []
+        is_saved = movie["_id"] in saved_movie_ids
 
         your_rating = db.ratings.find_one({
             "movie_id": movie["_id"],
@@ -281,9 +283,61 @@ def create_app():
             comments=comments,
             your_rating=your_rating,
             rating_summary=rating_summary,
+            is_saved=is_saved,
             user=current_user,
         )
 
+
+    @app.post("/movie/<movie_id>/save")
+    @login_required
+    def movie_save_toggle(movie_id):
+        movie_obj_id = oid(movie_id)
+        user_id = str(getattr(current_user, "id", ""))
+
+        saved_folder = db.folders.find_one({"user_id": user_id, "name": "Saved"})
+
+        if not saved_folder:
+            saved_folder_id = db.folders.insert_one({
+                "user_id": user_id,
+                "name": "Saved",
+                "movie_ids": [],
+                "created_at": datetime.utcnow(),
+                "updated_at": None,
+            }).inserted_id
+            saved_folder = db.folders.find_one({"_id": saved_folder_id})
+
+        if movie_obj_id in saved_folder.get("movie_ids", []):
+            db.folders.update_one(
+                {"_id": saved_folder["_id"], "user_id": user_id},
+                {"$pull": {"movie_ids": movie_obj_id}, "$set": {"updated_at": datetime.utcnow()}},
+            )
+        else:
+            db.folders.update_one(
+                {"_id": saved_folder["_id"], "user_id": user_id},
+                {"$addToSet": {"movie_ids": movie_obj_id}, "$set": {"updated_at": datetime.utcnow()}},
+            )
+
+        return redirect(url_for("movie_detail", movie_id=movie_id))
+
+
+    @app.post("/remove_saved_movie/<movie_id>")
+    @login_required
+    def remove_saved_movie(movie_id):
+        movie_obj_id = oid(movie_id)
+        user_id = str(current_user.id)
+
+        saved_folder = db.folders.find_one({"user_id": user_id, "name": "Saved"})
+
+        if saved_folder:
+            db.folders.update_one(
+                {"_id": saved_folder["_id"], "user_id": user_id},
+                {
+                    "$pull": {"movie_ids": movie_obj_id},
+                    "$set": {"updated_at": datetime.utcnow()},
+                },
+            )
+
+        return redirect(url_for("folders"))
 
     @app.post("/movie/<movie_id>/rating")
     @login_required
@@ -659,11 +713,74 @@ def create_app():
     @login_required
     def folders():
         user_id = str(current_user.id)
-        folders_list = list(db.folders.find({"user_id": user_id}).sort("created_at", -1))
+
+        saved_folder = db.folders.find_one({"user_id": user_id, "name": "Saved"})
+        saved_movie_ids = saved_folder.get("movie_ids", []) if saved_folder else []
+
+        saved_movies = []
+        if saved_movie_ids:
+            saved_movies = list(db.movies.find({"_id": {"$in": saved_movie_ids}}))
+
+        folders_list = list(db.folders.find({"user_id": user_id, "name": {"$ne": "Saved"}}).sort("created_at", -1)
+        )
         for folder in folders_list:
             folder["count"] = len(folder.get("movie_ids", []))
 
-        return render_template("folders.html", user=current_user, folders=folders_list)
+        return render_template("folders.html", user=current_user, folders=folders_list, saved_movies=saved_movies)
+
+
+    @app.get("/folders/<folder_id>")
+    @login_required
+    def folder_page(folder_id):
+        user_id = str(current_user.id)
+
+        folder = db.folders.find_one({"_id": oid(folder_id), "user_id": user_id})
+        if not folder:
+            abort(404)
+
+        raw_ids = folder.get("movie_ids", []) or []
+
+        movie_obj_ids = []
+        for mid in raw_ids:
+            if isinstance(mid, ObjectId):
+                movie_obj_ids.append(mid)
+            elif isinstance(mid, str):
+                try:
+                    movie_obj_ids.append(ObjectId(mid))
+                except Exception:
+                    pass
+
+        movies = []
+        if movie_obj_ids:
+            movies = list(
+                db.movies.find({"_id": {"$in": movie_obj_ids}}).sort("created_at", -1)
+            )
+
+        return render_template(
+            "folder_page.html",
+            user=current_user,
+            folder=folder,
+            movies=movies,
+        )
+
+
+    @app.post("/folders/<folder_id>/movies/<movie_id>/remove")
+    @login_required
+    def folder_movie_remove(folder_id, movie_id):
+        user_id = str(current_user.id)
+
+        folder = db.folders.find_one({"_id": oid(folder_id), "user_id": user_id})
+        if not folder:
+            abort(404)
+        db.folders.update_one(
+            {"_id": oid(folder_id), "user_id": user_id},
+            {
+                "$pull": {"movie_ids": oid(movie_id)},
+                "$set": {"updated_at": datetime.utcnow()},
+            },
+        )
+
+        return redirect(url_for("folder_page", folder_id=folder_id))
 
     @app.post("/folders/<folder_id>/delete")
     @login_required
@@ -673,6 +790,39 @@ def create_app():
             "user_id": str(current_user.id)
         })
         return redirect(url_for("folders"))
+    
+    @app.route("/add_to_folder/<movie_id>", methods=["GET", "POST"])
+    @login_required
+    def add_to_folder(movie_id):
+        user_id = str(current_user.id)
+
+        movie = db.movies.find_one({"_id": oid(movie_id)})
+        if not movie:
+            abort(404)
+
+        if request.method == "POST":
+            folder_id = (request.form.get("folder_id") or "").strip()
+            if not folder_id:
+                flash("Please choose a folder.")
+                return redirect(url_for("add_to_folder", movie_id=movie_id))
+
+            db.folders.update_one(
+                {"_id": oid(folder_id), "user_id": user_id},
+                {
+                    "$addToSet": {"movie_ids": oid(movie_id)},
+                    "$set": {"updated_at": datetime.utcnow()},
+                },
+            )
+            return redirect(url_for("folders"))
+
+        folders_list = list(
+            db.folders.find({"user_id": user_id, "name": {"$ne": "Saved"}}).sort("created_at", -1)
+        )
+        for f in folders_list:
+            f["count"] = len(f.get("movie_ids", []))
+
+        return render_template("add_to_folder.html", user=current_user, movie=movie, folders=folders_list
+        )
     
     # ---------- Registers ---------
     @app.route("/register", methods=["GET", "POST"])

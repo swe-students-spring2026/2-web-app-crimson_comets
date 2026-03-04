@@ -30,11 +30,13 @@
         <div class="card">
           <div class="card-body">
 
-            <h3>
-              <a href="{{ url_for('movie_detail', movie_id=movie._id) }}">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <h3 style="margin:0;">
                 {{ movie.title }}
-              </a>
-            </h3>
+              </h3>
+
+              <a class="btn tiny primary" style="width:auto;" href="{{ url_for('movie_detail', movie_id=movie._id) }}">Open</a>
+            </div>
 
             <p class="muted small">
               {{ movie.genre or "" }}

@@ -10,7 +10,7 @@
   <body>
     <header class="topbar">
       <div class="topbar-inner">
-        <div class="app-title">Movie App</div>
+        <a href="{{ url_for('home') }}" class="app-title" style="text-decoration:none; color:inherit;">Movie App</a>
 
         <div class="topbar-right">
           {% if current_user.is_authenticated %}
