@@ -67,7 +67,7 @@
       id="cast" 
       name="cast" 
       type="text" 
-      value="{% for m in movie.cast %}{{ m.role }}: {{ m.name }}{% if not loop.last %}, {% endif %}{% endfor %}"
+      value="{% for m in movie.cast %}{{ m.name }}: {{ m.role }}{% if not loop.last %}, {% endif %}{% endfor %}"
       placeholder="e.g., Timothée Chalamet, Zendaya">
 
     <label class="label" for="crew">Crew (comma-separated)</label>
@@ -75,8 +75,8 @@
       class="input" 
       id="crew" name="crew" 
       type="text" 
-      value="{% for m in movie.crew %}{{ m.role }}: {{ m.name }}{% if not loop.last %}, {% endif %}{% endfor %}"
-      placeholder="e.g., Cinematographer: Greig Fraser">
+      value="{% for m in movie.crew %}{{ m.name }}: {{ m.role }}{% if not loop.last %}, {% endif %}{% endfor %}"
+      placeholder="e.g., Greig Fraser: Cinematographer">
 
     <label class="label" for="poster">Poster</label>
     <input class="input" type="file" id="poster" name="poster" accept="image/*">
@@ -96,11 +96,11 @@
       placeholder="List awards here">{{ movie.awards|default('', true) }}</textarea>
 
     {% if movie %}
-      <button class="btn primary" type="post" style="margin-top: 20px;">Save Changes</button>
+      <a class="btn secondary" href="{{ url_for('update_my_movie', movie_id=movie._id) }}">Save Changes</a>
     {% else %}
       <button class="btn primary" type="submit" style="margin-top: 20px;">Post Film</button>
     {% endif %}
-    <a class="btn secondary" href="{{ url_for('home') }}">Cancel</a>
+      <a class="btn secondary" href="{{ url_for('home') }}">Cancel</a>
 
   </form>
   </div>
