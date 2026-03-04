@@ -25,9 +25,11 @@
 
 <!-- TOP: poster + basic info -->
 <div class="detail-top card">
-  <img class="poster-lg"
-       src="{{ movie.poster }}"
-       alt="Poster">
+  {% if movie.poster %}
+    <img class="poster-lg"
+        src="{{ url_for('static', filename='movie_photos/' + movie.poster) }}"
+        alt="Poster">
+  {% endif %}
 
   <div>
     <h2 class="movie-title">{{ movie.title }} <span class="muted">({{ movie.year }})</span></h2>
@@ -73,6 +75,26 @@
   </div>
   {% endfor %}
 </section>
+
+<!-- Stills -->
+{% if movie.stills %}
+  <section class="card">
+    <h3>Stills</h3>
+      <img class="poster-lg"
+          src="{{ url_for('static', filename='movie_photos/' + movie.stills) }}"
+          alt="Stills">
+  </section>
+  {% endif %}
+
+<!-- BTS -->
+{% if movie.bts %}
+  <section class="card">
+    <h3>Stills</h3>
+      <img class="poster-lg"
+          src="{{ url_for('static', filename='movie_photos/' + movie.bts) }}"
+          alt="BTS">
+  </section>
+  {% endif %}
 
 <!-- Comments -->
 <section class="card">

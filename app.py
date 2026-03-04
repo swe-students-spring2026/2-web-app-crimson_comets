@@ -4,6 +4,7 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from werkzeug.utils import secure_filename
 from bson import ObjectId
 import hashlib
 
@@ -21,6 +22,9 @@ load_dotenv()
 
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client[os.getenv("MONGO_DBNAME")]
+
+UPLOAD_FOLDER = 'static/movie_photos'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 def create_app():
@@ -444,14 +448,20 @@ def create_app():
             bts_filename = None
 
             if poster_file and poster_file.filename:
-                poster_file.save(f'images/movie_photos/{poster_file.filename}')
-                poster_filename = poster_file.filename
+                filename = secure_filename(poster_file.filename)
+                unique_filename = f"{ObjectId()}_{filename}"
+                poster_file.save(f'static/movie_photos/{unique_filename}')
+                poster_filename = unique_filename
             if stills_file and stills_file.filename:
-                stills_file.save(f'images/movie_photos/{stills_file.filename}')
-                stills_filename = stills_file.filename
+                filename = secure_filename(stills_file.filename)
+                unique_filename = f"{ObjectId()}_{filename}"
+                stills_file.save(f'static/movie_photos/{unique_filename}')
+                stills_filename = unique_filename
             if bts_file and bts_file.filename:
-                bts_file.save(f'images/movie_photos/{bts_file.filename}')
-                bts_filename = bts_file.filename
+                filename = secure_filename(bts_file.filename)
+                unique_filename = f"{ObjectId()}_{filename}"
+                bts_file.save(f'static/movie_photos/{unique_filename}')
+                bts_filename = unique_filename
 
             doc = {
                 "title": title,
@@ -524,14 +534,20 @@ def create_app():
         bts_filename = None
 
         if poster_file and poster_file.filename:
-            poster_file.save(f'images/movie_photos/{poster_file.filename}')
-            poster_filename = poster_file.filename
+            filename = secure_filename(poster_file.filename)
+            unique_filename = f"{ObjectId()}_{filename}"
+            poster_file.save(f'static/movie_photos/{unique_filename}')
+            poster_filename = unique_filename
         if stills_file and stills_file.filename:
-            stills_file.save(f'images/movie_photos/{stills_file.filename}')
-            stills_filename = stills_file.filename
+            filename = secure_filename(stills_file.filename)
+            unique_filename = f"{ObjectId()}_{filename}"
+            stills_file.save(f'static/movie_photos/{unique_filename}')
+            stills_filename = unique_filename
         if bts_file and bts_file.filename:
-            bts_file.save(f'images/movie_photos/{bts_file.filename}')
-            bts_filename = bts_file.filename
+            filename = secure_filename(bts_file.filename)
+            unique_filename = f"{ObjectId()}_{filename}"
+            bts_file.save(f'static/movie_photos/{unique_filename}')
+            bts_filename = unique_filename
 
         doc = {
             "title": title,
