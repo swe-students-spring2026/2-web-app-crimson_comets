@@ -110,7 +110,7 @@
   <h3>Top comments</h3>
 
   {% for c in comments %}
-  <div class="comment">
+  <div class="comment" id="comment-{{ c._id }}">
     <div class="row space-between">
       <div>
         <div class="comment-author">{{ c.author_name }}</div>
@@ -123,7 +123,11 @@
       </div>
 
       <form method="POST" action="{{ url_for('comment_like', movie_id=movie._id, comment_id=c._id) }}">
-        <button class="like-btn" type="submit">👍 {{ c.likes }}</button>
+        {% if user.id|string in c.get('liked_by', []) %}
+          <button class="like-btn liked" type="submit">👍 {{ c.likes }}</button>
+        {% else %}
+          <button class="like-btn" type="submit">👍 {{ c.likes }}</button>
+        {% endif %}
       </form>
     </div>
 

@@ -349,11 +349,37 @@ def create_app():
     @app.post("/movie/<movie_id>/comments/<comment_id>/like")
     @login_required
     def comment_like(movie_id, comment_id):
-        db.comments.update_one(
-            {"_id": oid(comment_id), "movie_id": oid(movie_id)},
-            {"$inc": {"likes": 1}},
+        user_id = str(current_user.id)
+        comment = db.comments.find_one(
+            {"_id": oid(comment_id), "movie_id": oid(movie_id)}
         )
-        return redirect(url_for("movie_detail", movie_id=movie_id))
+        
+        if not comment:
+            abort(404)
+        
+        # Check if user already liked this comment
+        liked_by = comment.get("liked_by", [])
+        
+        if user_id in liked_by:
+            # User already liked it, so unlike it
+            db.comments.update_one(
+                {"_id": oid(comment_id), "movie_id": oid(movie_id)},
+                {
+                    "$pull": {"liked_by": user_id},
+                    "$inc": {"likes": -1},
+                },
+            )
+        else:
+            # User hasn't liked it, so add their like
+            db.comments.update_one(
+                {"_id": oid(comment_id), "movie_id": oid(movie_id)},
+                {
+                    "$push": {"liked_by": user_id},
+                    "$inc": {"likes": 1},
+                },
+            )
+        
+        return redirect(url_for("movie_detail", movie_id=movie_id, _anchor=f"comment-{comment_id}"))
 
 
     @app.post("/movie/<movie_id>/comments/<comment_id>/delete")
