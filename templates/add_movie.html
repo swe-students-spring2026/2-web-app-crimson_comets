@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 
+<div style="margin-bottom: 16px;">
+  <a href="{{ url_for('home') }}">
+    <button class="btn secondary">← Back</button>
+  </a>
+</div>
+
 <section class="card">
   <div class="card-body">
-  <h2>Add a Movie</h2>
-  <p class="muted">
-    If the movie isn’t in our database, you can submit it here. Submissions may require review.
-  </p>
+    <h2>Add a Movie</h2>
+    <p class="muted">
+      If the movie isn’t in our database, you can submit it here. Submissions may require review.
+    </p>
   </div>
 </section>
 
