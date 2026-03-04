@@ -561,6 +561,14 @@ def create_app():
         )
         return render_template("my_movie.html", movie=movie, comments=comments, user=current_user)
 
+    @app.route("/my-movie/<movie_id>/<comment_id>", methods=["POST"])
+    @login_required
+    def reply_my_movie(movie_id, comment_id):
+        reply = request.form.get('reply')
+        db.comments.update_one({"_id": ObjectId(comment_id)}, {"$push": {"replies": reply}})
+        movie = db.movies.find_one({"_id": ObjectId(movie_id)})
+        return redirect(url_for('my_movie', movie_id=movie_id))
+
     # ---------- Folders (Harrison) ----------
     @app.get("/folders")
     @login_required
