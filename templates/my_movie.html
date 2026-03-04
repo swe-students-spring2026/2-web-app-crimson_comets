@@ -80,21 +80,25 @@
 {% if movie.stills %}
   <section class="card">
     <h3>Stills</h3>
+    {% for still in movie.stills %}
       <img class="poster-lg"
-          src="{{ url_for('static', filename='movie_photos/' + movie.stills) }}"
+          src="{{ url_for('static', filename='movie_photos/' + still) }}"
           alt="Stills">
+    {% endfor %}
   </section>
-  {% endif %}
+{% endif %}
 
 <!-- BTS -->
 {% if movie.bts %}
   <section class="card">
-    <h3>Stills</h3>
+    <h3>BTS</h3>
+    {% for each_bts in movie.bts %}
       <img class="poster-lg"
-          src="{{ url_for('static', filename='movie_photos/' + movie.bts) }}"
+          src="{{ url_for('static', filename='movie_photos/' + each_bts) }}"
           alt="BTS">
+    {% endfor %}
   </section>
-  {% endif %}
+{% endif %}
 
 <!-- Comments -->
 <section class="card">

@@ -440,28 +440,32 @@ def create_app():
             awards = request.form.get('awards')
 
             poster_file = request.files.get('poster')
-            stills_file = request.files.get('stills')
-            bts_file = request.files.get('bts')
+            stills_files = request.files.getlist('stills')
+            bts_files = request.files.getlist('bts')
 
             poster_filename = None
-            stills_filename = None
-            bts_filename = None
+            stills_filenames = []
+            bts_filenames = []
 
             if poster_file and poster_file.filename:
                 filename = secure_filename(poster_file.filename)
                 unique_filename = f"{ObjectId()}_{filename}"
                 poster_file.save(f'static/movie_photos/{unique_filename}')
                 poster_filename = unique_filename
-            if stills_file and stills_file.filename:
-                filename = secure_filename(stills_file.filename)
-                unique_filename = f"{ObjectId()}_{filename}"
-                stills_file.save(f'static/movie_photos/{unique_filename}')
-                stills_filename = unique_filename
-            if bts_file and bts_file.filename:
-                filename = secure_filename(bts_file.filename)
-                unique_filename = f"{ObjectId()}_{filename}"
-                bts_file.save(f'static/movie_photos/{unique_filename}')
-                bts_filename = unique_filename
+
+            for still in stills_files:
+                if still and still.filename:
+                    filename = secure_filename(still.filename)
+                    unique_filename = f"{ObjectId()}_{filename}"
+                    still.save(f'static/movie_photos/{unique_filename}')
+                    stills_filenames.append(unique_filename)
+
+            for each_bts in bts_files:
+                if each_bts and each_bts.filename:
+                    filename = secure_filename(each_bts.filename)
+                    unique_filename = f"{ObjectId()}_{filename}"
+                    each_bts.save(f'static/movie_photos/{unique_filename}')
+                    bts_filenames.append(unique_filename)
 
             doc = {
                 "title": title,
@@ -475,8 +479,8 @@ def create_app():
                 "status": "published",
                 "awards": awards,
                 "poster": poster_filename,
-                "stills": stills_filename,
-                "bts": bts_filename,
+                "stills": stills_filenames,
+                "bts": bts_filenames,
                 "created_by": ObjectId(current_user.id),
                 "created_at": datetime.utcnow(),
             }
@@ -526,28 +530,32 @@ def create_app():
         awards = request.form.get('awards')
 
         poster_file = request.files.get('poster')
-        stills_file = request.files.get('stills')
-        bts_file = request.files.get('bts')
+        stills_files = request.files.getlist('stills')
+        bts_files = request.files.getlist('bts')
 
         poster_filename = None
-        stills_filename = None
-        bts_filename = None
+        stills_filenames = []
+        bts_filenames = []
 
         if poster_file and poster_file.filename:
             filename = secure_filename(poster_file.filename)
             unique_filename = f"{ObjectId()}_{filename}"
             poster_file.save(f'static/movie_photos/{unique_filename}')
             poster_filename = unique_filename
-        if stills_file and stills_file.filename:
-            filename = secure_filename(stills_file.filename)
-            unique_filename = f"{ObjectId()}_{filename}"
-            stills_file.save(f'static/movie_photos/{unique_filename}')
-            stills_filename = unique_filename
-        if bts_file and bts_file.filename:
-            filename = secure_filename(bts_file.filename)
-            unique_filename = f"{ObjectId()}_{filename}"
-            bts_file.save(f'static/movie_photos/{unique_filename}')
-            bts_filename = unique_filename
+
+        for still in stills_files:
+            if still and still.filename:
+                filename = secure_filename(still.filename)
+                unique_filename = f"{ObjectId()}_{filename}"
+                still.save(f'static/movie_photos/{unique_filename}')
+                stills_filenames.append(unique_filename)
+
+        for each_bts in bts_files:
+            if each_bts and each_bts.filename:
+                filename = secure_filename(each_bts.filename)
+                unique_filename = f"{ObjectId()}_{filename}"
+                each_bts.save(f'static/movie_photos/{unique_filename}')
+                bts_filenames.append(unique_filename)
 
         doc = {
             "title": title,
@@ -561,8 +569,8 @@ def create_app():
             "status": "published",
             "awards": awards,
             "poster": poster_filename,
-            "stills": stills_filename,
-            "bts": bts_filename,
+            "stills": stills_filenames,
+            "bts": bts_filenames,
             "created_by": ObjectId(current_user.id),
             "created_at": datetime.utcnow(),
         }
