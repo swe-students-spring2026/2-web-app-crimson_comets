@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 
+<div class="page-nav">
+  <button onclick="history.back()" class="btn secondary">
+    ← Back
+  </button>
+</div>
+
 <section class="card">
   <div class="card-body">
     <h2>Search Results</h2>
@@ -12,6 +18,7 @@
     {% endif %}
   </div>
 </section>
+
 
 <section class="section">
 

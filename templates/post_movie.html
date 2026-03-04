@@ -1,15 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
- 
-<div style="text-align: center;">
-  <h2 style="margin-bottom: 0;">{{ "Edit Your Film" if movie else "Post Your Film" }}</h2>
+
+<div class="page-nav">
+  <button onclick="history.back()" class="btn secondary">
+    ← Back
+  </button>
+</div>
+
+<div class="center-header">
+  <h2 class="page-title">
+    {{ "Edit Your Film" if movie else "Post Your Film" }}
+  </h2>
+
   {% if not movie %}
-  <p class="muted" style="margin-top: 0px;">
-    Post a film that you wrote/directed.
-  </p>
+    <p class="muted subtitle">
+      Post a film that you wrote or directed.
+    </p>
   {% endif %}
 </div>
+
 
 <section class="card">
   <div class="card-body">

@@ -1,18 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div style="margin-bottom:10px; display: flex;">
-  <button onclick="history.back()" class="btn secondary">← Back</button>
+<div class="page-nav row" style="justify-content: space-between; margin-bottom:16px;">
 
-  <div class="row gap" style="margin-left: auto;">
-    <a href="{{ url_for('edit_my_movie', movie_id=movie._id) }}">
-      <button class="btn secondary">Edit</button>
-      </a>
+  <button onclick="history.back()" class="btn secondary">
+    ← Back
+  </button>
 
-    <a href="{{ url_for('delete_my_movie', movie_id=movie._id) }}">
-      <button class="btn secondary">Delete</button>
+  <div class="row gap">
+    <a href="{{ url_for('edit_my_movie', movie_id=movie._id) }}"
+       class="btn secondary">
+       Edit
+    </a>
+
+    <a href="{{ url_for('delete_my_movie', movie_id=movie._id) }}"
+       class="btn secondary">
+       Delete
     </a>
   </div>
+
 </div>
 
 

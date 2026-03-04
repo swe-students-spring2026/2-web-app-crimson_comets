@@ -97,7 +97,16 @@ def create_app():
     @login_required
     def home():
         user_id = str(current_user.id)
-        movies = list(db.movies.find({"status": "published"}).sort("created_at", -1).limit(10))
+        all_movies = list(db.movies.find())
+        for m in all_movies:
+            m["avg_rating"] = 0
+            m["comment_count"] = db.comments.count_documents({"movie_id": m["_id"]})
+            ratings = list(db.ratings.find({"movie_id": m["_id"]}))
+            if ratings:
+                m["avg_rating"] = sum(r["rating"] for r in ratings) / len(ratings)
+            m["trending_score"] = m["avg_rating"] * 2 + len(ratings) + m["comment_count"]
+
+        movies = sorted(all_movies, key=lambda x: x["trending_score"], reverse=True)[:3]
 
         if getattr(current_user, "role", "user") == "filmmaker":
             folders = list(db.folders.find({"user_id": user_id}))
@@ -570,10 +579,50 @@ def create_app():
         return redirect(url_for('my_movie', movie_id=movie_id))
 
     # ---------- Folders (Harrison) ----------
-    @app.get("/folders")
+    @app.route("/folders/new", methods=["GET", "POST"])
+    @login_required
+    def create_folder():
+        user_id = str(current_user.id)
+
+        if request.method == "POST":
+            name = request.form.get("name", "").strip()
+
+            if not name:
+                flash("Please enter a folder name.")
+                return redirect(url_for("create_folder"))
+
+            doc = {
+                "user_id": user_id,
+                "name": name,
+                "movie_ids": [],
+                "created_at": datetime.utcnow(),
+                "updated_at": None,
+            }
+
+            db.folders.insert_one(doc)
+
+            return redirect(url_for("folders"))
+
+        return render_template("create_folder.html", user=current_user)
+    
+    @app.route("/folders", methods=["GET"])
     @login_required
     def folders():
-        return render_template("folders.html", user=current_user)
+        user_id = str(current_user.id)
+        folders_list = list(db.folders.find({"user_id": user_id}).sort("created_at", -1))
+        for folder in folders_list:
+            folder["count"] = len(folder.get("movie_ids", []))
+
+        return render_template("folders.html", user=current_user, folders=folders_list)
+
+    @app.post("/folders/<folder_id>/delete")
+    @login_required
+    def delete_folder(folder_id):
+        db.folders.delete_one({
+            "_id": oid(folder_id),
+            "user_id": str(current_user.id)
+        })
+        return redirect(url_for("folders"))
     
     # ---------- Registers ---------
     @app.route("/register", methods=["GET", "POST"])
