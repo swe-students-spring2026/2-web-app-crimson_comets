@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container narrow">
+    <div style="margin-bottom:16px;">
+    <a href="{{ url_for('login') }}" class="btn secondary">
+      ← Back
+    </a>
+  </div>
+
     <div class="card">
         <h1 class="h1">Movie App</h1>
         <p class="muted">Create Your Account</p>
