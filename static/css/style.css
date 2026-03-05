@@ -503,6 +503,14 @@ body{
   font-weight: 800;
 }
 
+.reply {
+    margin-top: 2px;
+}
+
+.reply p {
+    margin: 0;
+}
+
 /* =========================
    KARA COMPAT HELPERS
    ========================= */
