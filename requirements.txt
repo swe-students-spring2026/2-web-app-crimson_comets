@@ -10,3 +10,4 @@ MarkupSafe==3.0.3
 pymongo==3.11.3
 python-dotenv==0.16.0
 Werkzeug==3.1.6
+dnspython==2.6.1
