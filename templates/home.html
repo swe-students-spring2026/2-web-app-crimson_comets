@@ -27,11 +27,8 @@
         </div>
 
         <div class="actions">
-          <a href="{{ url_for('post_movie') }}">
-            <button class="btn" type="button">+ Post Movie</button>
-          </a>
-          <!-- <button class="btn" type="button">Manage Folders</button> -->
-           <a href="{{ url_for('folders') }}" class="btn" role="button">Manage Folders</a>
+          <a href="{{ url_for('post_movie') }}" class="btn">+ Post Movie</a>
+          <a href="{{ url_for('folders') }}" class="btn">Folders</a>
         </div>
       </section>
 
@@ -61,7 +58,7 @@
 
         <div class="actions">
           <!-- <button class="btn" type="button">Manage Folders</button> -->
-           <a href="{{ url_for('folders') }}" class="btn" role="button">Manage Folders</a>
+           <a href="{{ url_for('folders') }}" class="btn" role="button">Folders</a>
         </div>
       </section>
     {% endif %}
@@ -161,26 +158,6 @@
         </div>
       </section>
     {% endif %}
-
-    <!-- Folders -->
-    <section class="section">
-      <div class="section-head">
-        <h2 class="section-title">Your Folders</h2>
-      </div>
-
-      <div class="folder-grid">
-        {% for f in profile.folders %}
-          <div class="folder-card">
-            <div class="folder-top">
-              <div class="folder-name">{{ f.name }}</div>
-              <span class="chip">{{ f.count }} movies</span>
-            </div>
-            <div class="muted small">A quick collection for {{ f.name|lower }}.</div>
-            <button class="btn tiny" type="button">Open</button>
-          </div>
-        {% endfor %}
-      </div>
-    </section>
 
   </main>
 </div>
