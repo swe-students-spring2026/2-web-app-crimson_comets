@@ -155,6 +155,15 @@
       </form>
     </div>
     {% endif %}
+
+    {% if c.replies %}
+      <div class="comment-author" style="margin-top: 20px;">Director's Reply: </div>
+      {% for reply in c.replies %}
+        <div class="reply">
+          <p>{{ reply }}</p>
+        </div>
+      {% endfor %}
+    {% endif %}
   </div>
   {% else %}
     <p class="muted">No comments yet.</p>
